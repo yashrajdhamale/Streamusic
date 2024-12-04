@@ -11,11 +11,11 @@ function MusicPlayer({ song, onPrev, onNext }) {
 
   useEffect(() => {
     const fetchVideoId = async () => {
-      if (!song || !song.name) return;
+      if (!song || !song.track.name) return;
 
       try {
         const response = await fetch(
-          `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(song.name)}&key=AIzaSyB8xe-pC_uYbBOdQ9_JldZxJHyZyxGZ2gU&type=video&maxResults=1&videoCategoryId=10`
+          `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(song.track.name)}&key=AIzaSyB8xe-pC_uYbBOdQ9_JldZxJHyZyxGZ2gU&type=video&maxResults=1&videoCategoryId=10`
         );
         const data = await response.json();
         const fetchedVideoId = data.items[0]?.id?.videoId;
@@ -35,10 +35,10 @@ function MusicPlayer({ song, onPrev, onNext }) {
     // Media Session API setup for background control
     if ("mediaSession" in navigator && song) {
       navigator.mediaSession.metadata = new MediaMetadata({
-        title: song.name,
-        artist: song.artists.map((artist) => artist.name).join(", "),
-        album: song.album?.name || "",
-        artwork: [{ src: song.album?.images[0]?.url || "https://via.placeholder.com/64", sizes: "96x96", type: "image/png" }]
+        title: song.track.name,
+        artist: song.track.artists.map((artist) => artist.name).join(", "),
+        album: song.track.album?.name || "",
+        artwork: [{ src: song.track.album?.images[0]?.url || "https://via.placeholder.com/64", sizes: "96x96", type: "image/png" }]
       });
 
       navigator.mediaSession.setActionHandler("play", () => {
@@ -143,17 +143,17 @@ function MusicPlayer({ song, onPrev, onNext }) {
       <div className="flex items-center">
         {song && (
           <img
-            src={song.album?.images[0]?.url || "https://via.placeholder.com/64"}
-            alt={song.name}
+            src={song.track.album?.images[0]?.url || "https://via.placeholder.com/64"}
+            alt={song.track.name}
             className="w-16 h-16 mr-4 rounded"
           />
         )}
         <div>
           {song ? (
             <>
-              <div className="text-lg font-semibold">{song.name}</div>
+              <div className="text-lg font-semibold">{song.track.name}</div>
               <div className="text-sm text-gray-400">
-                {song.artists.map((artist) => artist.name).join(", ")}
+                {song.track.artists.map((artist) => artist.name).join(", ")}
               </div>
             </>
           ) : (
