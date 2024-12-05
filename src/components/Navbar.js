@@ -28,11 +28,11 @@ function Navbar({ setLikedSongs }) {
     const hashed = await sha256(codeVerifier);
     const codeChallenge = base64encode(hashed);
     const clientId = '1f4050f896f5482e91355d3c6ea5dd46';
-    const redirectUri = 'https://sarathi062.github.io/Streamusic/callback';
+    const redirectUri = 'https://sarathi062.github.io/Streamusic/'; // Keep this as-is
     const scope = 'user-read-private user-read-email user-library-read';
-
+  
     window.localStorage.setItem('code_verifier', codeVerifier);
-
+  
     const params = {
       response_type: 'code',
       client_id: clientId,
@@ -41,14 +41,15 @@ function Navbar({ setLikedSongs }) {
       code_challenge: codeChallenge,
       redirect_uri: redirectUri,
     };
-
+  
     const authUrl = `https://accounts.spotify.com/authorize?${new URLSearchParams(params).toString()}`;
     window.location.href = authUrl;
   };
+  
 
   const getToken = async (code) => {
     const clientId = '1f4050f896f5482e91355d3c6ea5dd46';
-    const redirectUri = 'https://sarathi062.github.io/Streamusic/callback';
+    const redirectUri = 'https://sarathi062.github.io/Streamusic/';
     const codeVerifier = localStorage.getItem('code_verifier');
     const url = 'https://accounts.spotify.com/api/token';
 
@@ -87,7 +88,7 @@ function Navbar({ setLikedSongs }) {
   };
 
   const fetchLikedSongs = async (token) => {
-    const response = await fetch('https://api.spotify.com/v1/me/tracks?limit=50', {
+    const response = await fetch('https://api.spotify.com/v1/me/tracks?limit=20', {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await response.json();
@@ -136,28 +137,28 @@ function Navbar({ setLikedSongs }) {
   };
 
   useEffect(() => {
-	const urlParams = new URLSearchParams(window.location.search);
-	const code = urlParams.get('code');
-	const storedAccessToken = localStorage.getItem('access_token');
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    const storedAccessToken = localStorage.getItem('access_token');
   
-	const handleAuthCallback = async () => {
-	  if (code) {
-		await getToken(code);
+    const handleAuthCallback = async () => {
+      if (code) {
+        await getToken(code);
   
-		// Remove code from URL without refreshing the page
-		const newUrl = window.location.origin;
-		window.history.pushState({}, document.title, newUrl);
-	  } else if (storedAccessToken) {
-		// If access token exists, fetch user data and liked songs
-		fetchSpotifyUser(storedAccessToken);
-		fetchLikedSongs(storedAccessToken);
-	  } else {
-		// If no access token, try refreshing it
-		refreshToken();
-	  }
-	};
+        // Clean up the URL after processing the code
+        const newUrl = `${window.location.origin}${window.location.pathname}`;
+        window.history.pushState({}, document.title, newUrl);
+      } else if (storedAccessToken) {
+        // If access token exists, fetch user data and liked songs
+        fetchSpotifyUser(storedAccessToken);
+        fetchLikedSongs(storedAccessToken);
+      } else {
+        // If no access token, try refreshing it
+        refreshToken();
+      }
+    };
   
-	handleAuthCallback();
+    handleAuthCallback();
   }, []);
   
 
