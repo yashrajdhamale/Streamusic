@@ -28,11 +28,11 @@ function Navbar({ setLikedSongs }) {
     const hashed = await sha256(codeVerifier);
     const codeChallenge = base64encode(hashed);
     const clientId = '1f4050f896f5482e91355d3c6ea5dd46';
-    const redirectUri = 'https://sarathi062.github.io/Streamusic/callback';
+    const redirectUri = 'https://sarathi062.github.io/Streamusic/callback'; // Keep this as-is
     const scope = 'user-read-private user-read-email user-library-read';
-
+  
     window.localStorage.setItem('code_verifier', codeVerifier);
-
+  
     const params = {
       response_type: 'code',
       client_id: clientId,
@@ -41,10 +41,11 @@ function Navbar({ setLikedSongs }) {
       code_challenge: codeChallenge,
       redirect_uri: redirectUri,
     };
-
+  
     const authUrl = `https://accounts.spotify.com/authorize?${new URLSearchParams(params).toString()}`;
     window.location.href = authUrl;
   };
+  
 
   const getToken = async (code) => {
     const clientId = '1f4050f896f5482e91355d3c6ea5dd46';
@@ -136,29 +137,32 @@ function Navbar({ setLikedSongs }) {
   };
 
   useEffect(() => {
-	const urlParams = new URLSearchParams(window.location.search);
-	const code = urlParams.get('code');
-	const storedAccessToken = localStorage.getItem('access_token');
+    const urlHash = window.location.hash;
+    const codeMatch = urlHash.match(/code=([^&]+)/);
+    const code = codeMatch ? codeMatch[1] : null;
   
-	const handleAuthCallback = async () => {
-	  if (code) {
-		await getToken(code);
+    const storedAccessToken = localStorage.getItem('access_token');
   
-		// Remove code from URL without refreshing the page
-		const newUrl = window.location.origin;
-		window.history.pushState({}, document.title, newUrl);
-	  } else if (storedAccessToken) {
-		// If access token exists, fetch user data and liked songs
-		fetchSpotifyUser(storedAccessToken);
-		fetchLikedSongs(storedAccessToken);
-	  } else {
-		// If no access token, try refreshing it
-		refreshToken();
-	  }
-	};
+    const handleAuthCallback = async () => {
+      if (code) {
+        await getToken(code);
   
-	handleAuthCallback();
+        // Remove the hash from the URL without refreshing the page
+        const newUrl = `${window.location.origin}${window.location.pathname}`;
+        window.history.pushState({}, document.title, newUrl);
+      } else if (storedAccessToken) {
+        // If access token exists, fetch user data and liked songs
+        fetchSpotifyUser(storedAccessToken);
+        fetchLikedSongs(storedAccessToken);
+      } else {
+        // If no access token, try refreshing it
+        refreshToken();
+      }
+    };
+  
+    handleAuthCallback();
   }, []);
+  
   
 
   return (
