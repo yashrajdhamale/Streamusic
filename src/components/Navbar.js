@@ -88,7 +88,7 @@ function Navbar({ setLikedSongs }) {
   };
 
   const fetchLikedSongs = async (token) => {
-    const response = await fetch('https://api.spotify.com/v1/me/tracks?limit=50', {
+    const response = await fetch('https://api.spotify.com/v1/me/tracks?limit=20', {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await response.json();
