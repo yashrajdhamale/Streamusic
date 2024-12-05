@@ -28,7 +28,7 @@ function Navbar({ setLikedSongs }) {
     const hashed = await sha256(codeVerifier);
     const codeChallenge = base64encode(hashed);
     const clientId = '1f4050f896f5482e91355d3c6ea5dd46';
-    const redirectUri = 'https://sarathi062.github.io/Streamusic/callback'; // Keep this as-is
+    const redirectUri = 'https://sarathi062.github.io/Streamusic/'; // Keep this as-is
     const scope = 'user-read-private user-read-email user-library-read';
   
     window.localStorage.setItem('code_verifier', codeVerifier);
@@ -49,7 +49,7 @@ function Navbar({ setLikedSongs }) {
 
   const getToken = async (code) => {
     const clientId = '1f4050f896f5482e91355d3c6ea5dd46';
-    const redirectUri = 'https://sarathi062.github.io/Streamusic/callback';
+    const redirectUri = 'https://sarathi062.github.io/Streamusic/';
     const codeVerifier = localStorage.getItem('code_verifier');
     const url = 'https://accounts.spotify.com/api/token';
 
@@ -137,17 +137,15 @@ function Navbar({ setLikedSongs }) {
   };
 
   useEffect(() => {
-    const urlHash = window.location.hash;
-    const codeMatch = urlHash.match(/code=([^&]+)/);
-    const code = codeMatch ? codeMatch[1] : null;
-  
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
     const storedAccessToken = localStorage.getItem('access_token');
   
     const handleAuthCallback = async () => {
       if (code) {
         await getToken(code);
   
-        // Remove the hash from the URL without refreshing the page
+        // Clean up the URL after processing the code
         const newUrl = `${window.location.origin}${window.location.pathname}`;
         window.history.pushState({}, document.title, newUrl);
       } else if (storedAccessToken) {
@@ -162,7 +160,6 @@ function Navbar({ setLikedSongs }) {
   
     handleAuthCallback();
   }, []);
-  
   
 
   return (
