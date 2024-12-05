@@ -28,7 +28,7 @@ function Navbar({ setLikedSongs }) {
     const hashed = await sha256(codeVerifier);
     const codeChallenge = base64encode(hashed);
     const clientId = '1f4050f896f5482e91355d3c6ea5dd46';
-    const redirectUri = 'http://localhost:3000/callback';
+    const redirectUri = 'https://sarathi062.github.io/Streamusic/callback';
     const scope = 'user-read-private user-read-email user-library-read';
 
     window.localStorage.setItem('code_verifier', codeVerifier);
@@ -48,7 +48,7 @@ function Navbar({ setLikedSongs }) {
 
   const getToken = async (code) => {
     const clientId = '1f4050f896f5482e91355d3c6ea5dd46';
-    const redirectUri = 'http://localhost:3000/callback';
+    const redirectUri = 'https://sarathi062.github.io/Streamusic/callback';
     const codeVerifier = localStorage.getItem('code_verifier');
     const url = 'https://accounts.spotify.com/api/token';
 
