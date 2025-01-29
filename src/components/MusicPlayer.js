@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import YouTube from "react-youtube";
-import { Box, Card, CardContent, Typography, Button, Slider, Stack } from "@mui/material";
+import { Box, Card, Typography, Button, Slider, Stack } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 
 function MusicPlayer({ song, onPrev, onNext }) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -11,7 +12,7 @@ function MusicPlayer({ song, onPrev, onNext }) {
   const playerRef = useRef(null);
 
   const fetchVideoId = async () => {
-    const query = song?.name || song?.title; // Check for both 'name' and 'title'
+    const query = song?.name || song?.title;
     if (!query) return;
 
     try {
@@ -28,11 +29,9 @@ function MusicPlayer({ song, onPrev, onNext }) {
     }
   };
 
-  // Call the function inside useEffect
   useEffect(() => {
     fetchVideoId();
   }, [song]);
-
 
   useEffect(() => {
     if ("mediaSession" in navigator && song) {
@@ -41,7 +40,9 @@ function MusicPlayer({ song, onPrev, onNext }) {
         title: name,
         artist: artists?.map((artist) => artist.name).join(", "),
         album: album?.name || "Unknown Album",
-        artwork: [{ src: album?.images?.[0]?.url || "", sizes: "96x96", type: "image/png" }]
+        artwork: [
+          { src: album?.images?.[0]?.url || "", sizes: "96x96", type: "image/png" },
+        ],
       });
 
       navigator.mediaSession.setActionHandler("previoustrack", onPrev);
@@ -89,60 +90,92 @@ function MusicPlayer({ song, onPrev, onNext }) {
   };
 
   return (
-    <Card sx={{ maxWidth: 600, margin: "auto", p: 2, borderRadius: 2, boxShadow: 3 }}>
-      <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
-        {videoId ? (
-          <Box sx={{ width: "100%", height: 0, paddingBottom: "56.25%", position: "relative" }}>
-            <YouTube
-              videoId={videoId}
-              opts={{ width: "100%", height: "100%", playerVars: { autoplay: 1 } }}
-              onStateChange={handleVideoStateChange}
-              onReady={handleOnReady}
-              style={{ position: "absolute", top: 0, left: 0 }}
-            />
-          </Box>
-        ) : (
-          <Typography variant="body1">No video available</Typography>
-        )}
-
-        <CardContent sx={{ textAlign: "center" }}>
-          {song ? (
-            <>
-              <Typography variant="h6" fontWeight="bold">
-                {song.name || song.title || "Unknown Title"}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {song.artists?.map((artist) => artist.name).join(", ") || ""}
-              </Typography>
-            </>
+    <Box
+      sx={{
+        position: "fixed",
+        bottom: 0,
+        left: 0,
+        width: "100%",
+        backgroundColor: "#fff",
+        boxShadow: "0px -2px 10px rgba(0, 0, 0, 0.1)",
+        zIndex: 1000,
+        p: 2,
+      }}
+    >
+      <Grid container alignItems="center" justifyContent="space-between">
+        {/* Video Section */}
+        <Grid item xs={3} alignItems="center">
+          {videoId ? (
+            <Box
+              sx={{
+                width: "0",
+                height: "0",
+                position: "relative",
+                overflow: "hidden",
+              }}
+            >
+              <YouTube
+                videoId={videoId}
+                opts={{
+                  width: "0",
+                  height: "0",
+                  playerVars: { autoplay: 1 },
+                }}
+                onStateChange={handleVideoStateChange}
+                onReady={handleOnReady}
+                style={{ position: "absolute", top: 0, left: 0 }}
+              />
+            </Box>
           ) : (
-            <Typography variant="body1">No song selected</Typography>
+            <Typography variant="body1">No video available</Typography>
           )}
-        </CardContent>
+        </Grid>
 
-        <Box display="flex" alignItems="center" gap={2} width="100%">
-          <Typography variant="body2">{formatTime(currentTime)}</Typography>
-          <Slider
-            value={currentTime}
-            min={0}
-            max={duration}
-            onChange={handleSliderChange}
-            onChangeCommitted={handleSliderCommit}
-            sx={{ flex: 1 }}
-          />
-          <Typography variant="body2">{formatTime(duration)}</Typography>
-        </Box>
+        {/* Song Info and Controls */}
+        <Grid item xs={9}>
+          <Stack spacing={2} direction="row" alignItems="center" justifyContent="space-between">
+            <Box flex={1}>
+              {song ? (
+                <>
+                  <Typography variant="h6" fontWeight="">
+                    {song.name || song.title || "Unknown Title"}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {song.artists?.map((artist) => artist.name).join(", ") || ""}
+                  </Typography>
+                </>
+              ) : (
+                <Typography variant="body1">No song selected</Typography>
+              )}
+            </Box>
 
-        <Stack direction="row" spacing={2} justifyContent="center">
-          <Button variant="outlined" onClick={onPrev}>
-            Previous
-          </Button>
-          <Button variant="contained" onClick={onNext}>
-            Next
-          </Button>
-        </Stack>
-      </Box>
-    </Card>
+            <Box flex={2}>
+              <Stack spacing={1} direction="row" alignItems="center">
+                <Typography variant="body2">{formatTime(currentTime)}</Typography>
+                <Slider
+                  value={currentTime}
+                  min={0}
+                  max={duration}
+                  onChange={handleSliderChange}
+                  onChangeCommitted={handleSliderCommit}
+                  sx={{ flex: 1 }}
+                />
+                <Typography variant="body2">{formatTime(duration)}</Typography>
+              </Stack>
+            </Box>
+
+            <Stack direction="row" spacing={2}>
+              <Button variant="outlined" onClick={onPrev}>
+                Previous
+              </Button>
+              <Button variant="contained" onClick={onNext}>
+                Next
+              </Button>
+            </Stack>
+          </Stack>
+        </Grid>
+      </Grid>
+    </Box>
   );
 }
 
