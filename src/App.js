@@ -9,7 +9,12 @@ import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid2';
 import Stack from '@mui/material/Stack';
+
 import { debounce } from 'lodash'; // Import lodash debounce
+
+
+import { useDispatch } from "react-redux";
+import { setToken } from "./store/authSlice";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: '#fff',
@@ -29,6 +34,10 @@ function App() {
   const [changedwidow, setChangedwindow] = useState(false);
   const [finalclose, setFinalClose] = useState(false);
 
+
+  const dispatch = useDispatch();
+
+
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -42,6 +51,66 @@ function App() {
     setChangedwindow(true);
   }, 200); // 200ms debounce delay
 
+
+  const fetchAccessToken = async () => {
+    const clientId = "4f474f7b56eb4f5783bc0b2f187d8eda";
+    const clientSecret = "296b0e7d63314ed9bab2e6fd8b2a34e5";
+    const url = "https://accounts.spotify.com/api/token";
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Authorization: `Basic ${btoa(`${clientId}:${clientSecret}`)}`,
+        },
+        body: new URLSearchParams({ grant_type: "client_credentials" }),
+      });
+
+      const data = await response.json();
+      if (data.access_token) {
+        const expiresAt = Date.now() + data.expires_in * 1000;
+        const accessToken = data.access_token;
+
+        // Save to localStorage
+        localStorage.setItem(
+          "spotify_access_token",
+          JSON.stringify({ accessToken, expiresAt })
+        );
+
+        // Save to Redux
+        dispatch(setToken({ accessToken, expiresAt }));
+      } else {
+        console.error("Failed to get access token:", data);
+      }
+    } catch (error) {
+      console.error("Error fetching access token:", error);
+    }
+  };
+
+  const getToken = async () => {
+    const storedToken = localStorage.getItem("spotify_access_token");
+
+    if (storedToken) {
+      const { accessToken, expiresAt } = JSON.parse(storedToken);
+      if (Date.now() < expiresAt) {
+        // If token is still valid, update Redux & return
+        dispatch(setToken({ accessToken, expiresAt }));
+        return;
+      }
+    }
+
+    // If token is missing or expired, fetch a new one
+    await fetchAccessToken();
+  };
+
+
+  useEffect(() => {
+    getToken();
+  }, []);
+
+
+
   useEffect(() => {
     window.addEventListener('resize', handleResize);
 
@@ -49,6 +118,8 @@ function App() {
       window.removeEventListener('resize', handleResize);
     };
   }, [handleResize]);
+
+
 
   const handleNextSong = () => {
     if (queuedSong.length > 0) {
@@ -71,7 +142,7 @@ function App() {
           <Grid size={12}>
             <Navbar setSearchResults={setSearchResults} />
           </Grid>
-          {windowSize.width < 600 ? (
+          {/* {windowSize.width < 600 ? (
             <Stack spacing={2}>
               <Grid size={changedwidow ? 12 : 6}>
                 <ListOFSearchedSong searchResults={searchResults} setQueue={setQueue} setFinalClose={setFinalClose} />
@@ -96,7 +167,7 @@ function App() {
               onNext={handleNextSong}
               onPrev={handlePrevSong}
             />
-          </Grid>
+          </Grid> */}
         </Grid>
       </Box>
     </>
