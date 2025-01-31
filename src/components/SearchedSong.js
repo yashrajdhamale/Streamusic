@@ -119,7 +119,7 @@ export default function SearchedSong({ searchResults, setQueue, loading, setFina
                             )}
 
                             {/* Trending Songs Section */}
-                            {searchResults.length == 0 && trendingSongs && trendingSongs.length > 0 && (
+                            {searchResults.length === 0 && trendingSongs && trendingSongs.length > 0 && (
                                 <div>
 
                                     <Grid container spacing={2} justifyContent="space-between" alignItems="center">
