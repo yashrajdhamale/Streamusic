@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
-import Sidebar from './components/Sidebar';
 import MusicPlayer from './components/MusicPlayer';
 import QueuedSongs from './components/QueuedSongs';
 import ListOFSearchedSong from './components/SearchedSong';
@@ -25,7 +24,14 @@ const Item = styled(Paper)(({ theme }) => ({
   ...theme.applyStyles('dark', {
     backgroundColor: '#1A2027',
   }),
-}));  
+}));
+
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+  return null;
+}
 
 function App() {
   const [currentSong, setCurrentSong] = useState(null);
@@ -33,8 +39,8 @@ function App() {
   const [searchResults, setSearchResults] = useState([]);
   const [changedwidow, setChangedwindow] = useState(false);
   const [finalclose, setFinalClose] = useState(false);
-  
- 
+
+
   const dispatch = useDispatch();
 
 
@@ -72,12 +78,9 @@ function App() {
         const expiresAt = Date.now() + data.expires_in * 1000;
         const accessToken = data.access_token;
 
-        // Save to localStorage
-        localStorage.setItem(
-          "spotify_access_token",
-          JSON.stringify({ accessToken, expiresAt })
-        );
-
+        
+        document.cookie = `spotify_access_token=${accessToken}; path=/; max-age=${expiresAt}; Secure; SameSite=None`;
+        document.cookie = `spotifyAppExpiresAt=${expiresAt}; path=/; max-age=${expiresAt}; Secure; SameSite=None`;
         // Save to Redux
         dispatch(setToken({ accessToken, expiresAt }));
       } else {
@@ -89,12 +92,12 @@ function App() {
   };
 
   const getToken = async () => {
-    const storedToken = localStorage.getItem("spotify_access_token");
+    const storedToken = getCookie("spotify_access_token");
     if (storedToken) {
-      const { accessToken, expiresAt } = JSON.parse(storedToken);
+      const expiresAt = parseInt(getCookie('spotifyAppExpiresAt'), 10);
       if (Date.now() < expiresAt) {
         // If token is still valid, update Redux & return
-        dispatch(setToken({ accessToken, expiresAt }));
+        dispatch(setToken({ storedToken, expiresAt }));
         return;
       }
     }
@@ -105,11 +108,11 @@ function App() {
 
   //user access token
   const getuserRefereshtoken = async () => {
-    const refreshToken = localStorage.getItem("spotifyRefreshToken");
+    const refreshToken = getCookie('spotifyRefreshToken');
+    const spotifyExpiresAt = parseInt(getCookie('spotifyExpiresAt'), 10);
+    const spotifyAccessToken = getCookie('spotifyAccessToken');
     const clientId = process.env.REACT_APP_CLIENT_ID;
     const clientSecret = process.env.REACT_APP_CLIENT_SECRET;
-    const spotifyExpiresAt = parseInt(localStorage.getItem("spotifyExpiresAt"), 10);
-    const spotifyAccessToken = localStorage.getItem("spotifyAccessToken");
 
     if (spotifyExpiresAt < Date.now() || (!spotifyAccessToken || spotifyAccessToken === "null")) {
       if (!refreshToken) return;
@@ -130,8 +133,8 @@ function App() {
 
         if (data.access_token) {
           dispatch(setAuth({ userauth: true, UaccessToken: data.access_token }));
-          localStorage.setItem("spotifyAccessToken", data.access_token);
-          localStorage.setItem("spotifyExpiresAt", Date.now() + data.expires_in * 1000);
+          document.cookie = `spotifyAccessToken=${data.access_token}; path=/; max-age=${data.expires_in};Secure; SameSite=None`;
+          document.cookie = `spotifyExpiresAt=${Date.now() + data.expires_in * 1000}; path=/; max-age=${data.expires_in};Secure; SameSite=None`;
         }
       } catch (error) {
         console.error("Error refreshing access token:", error);
@@ -140,8 +143,8 @@ function App() {
   }
 
   useEffect(() => {
-    const logedIn = localStorage.getItem("logedIn");
-    const spotifyAccessToken = localStorage.getItem("spotifyAccessToken");
+    const logedIn = getCookie('logedIn');
+    const spotifyAccessToken = getCookie('spotifyAccessToken');
     if (logedIn) {
       dispatch(setAuth({ userauth: true, UaccessToken: spotifyAccessToken }));
     }

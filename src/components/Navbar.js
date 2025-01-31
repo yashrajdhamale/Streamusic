@@ -97,10 +97,11 @@ function Navbar({ setSearchResults }) {
       },
       signOut: () => {
         setSession(null);
-        localStorage.removeItem("logedIn");
-        localStorage.removeItem("spotifyAccessToken");
-        localStorage.removeItem("spotifyExpiresAt");
-        localStorage.removeItem("spotifyRefreshToken");
+        document.cookie = "logedIn=; path=/; max-age=0; Secure; SameSite=None";
+        document.cookie = "spotifyAccessToken=; path=/; max-age=0; Secure; SameSite=None";
+        document.cookie = "spotifyExpiresAt=; path=/; max-age=0; Secure; SameSite=None";
+        document.cookie = "spotifyRefreshToken=; path=/; max-age=0; Secure; SameSite=None";
+        
         dispatch(setAuth({ userauth: false }));
 
       },

@@ -21,10 +21,10 @@ const redirectUri = process.env.REACT_APP_REDIRECT_URI;
 const LoginDialog = ({ open, handleClose }) => {
     const { UaccessToken } = useSelector((state) => state.userauth);
     const dispatch = useDispatch();
-const { userauth } = useSelector((state) => state.userauth); 
+    const { userauth } = useSelector((state) => state.userauth);
     const spotifyAuthUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user-read-private user-read-email playlist-read-private user-library-read`;
 
-    
+
     const fetchAccessToken = async (code) => {
         try {
             const response = await fetch("https://accounts.spotify.com/api/token", {
@@ -44,10 +44,13 @@ const { userauth } = useSelector((state) => state.userauth);
 
             if (data.access_token) {
 
-                localStorage.setItem("spotifyAccessToken", data.access_token);
-                localStorage.setItem("spotifyRefreshToken", data.refresh_token);
-                localStorage.setItem("spotifyExpiresAt", Date.now() + data.expires_in * 1000);
-                localStorage.setItem("logedIn", true);
+                const expiresIn = data.expires_in * 1000;  // Convert to milliseconds
+                //Secure;
+                document.cookie = `spotifyAccessToken=${data.access_token}; path=/; max-age=${data.expires_in}; Secure; SameSite=None`;
+                document.cookie = `spotifyRefreshToken=${data.refresh_token}; path=/; max-age=${data.expires_in}; Secure;SameSite=None`;
+                document.cookie = `spotifyExpiresAt=${Date.now() + expiresIn}; path=/; max-age=${data.expires_in};  Secure;SameSite=None`;
+                document.cookie = `logedIn=true; path=/; max-age=${data.expires_in}; Secure; SameSite=None`;
+
                 dispatch(setAuth({ userauth: true, UaccessToken: data.access_token }));
 
                 handleClose();
@@ -63,7 +66,7 @@ const { userauth } = useSelector((state) => state.userauth);
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const authCode = urlParams.get("code");
-        
+
         if (authCode && !UaccessToken) {
             fetchAccessToken(authCode);
         }
