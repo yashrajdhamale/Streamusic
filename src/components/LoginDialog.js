@@ -10,21 +10,21 @@ import {
 } from "@mui/material";
 
 import { useDispatch } from "react-redux";
-
 import { setAuth } from "../store/authSlice";
+import { useSelector } from "react-redux";
 
 
-const clientId = "4f474f7b56eb4f5783bc0b2f187d8eda";
-const clientSecret = "296b0e7d63314ed9bab2e6fd8b2a34e5";
+const clientId = process.env.REACT_APP_CLIENT_ID;
+const clientSecret = process.env.REACT_APP_CLIENT_SECRET;
 const redirectUri = "http://localhost:3000/Streamusic/callback";
 
 const LoginDialog = ({ open, handleClose }) => {
-    const [accessToken, setAccessToken] = useState(localStorage.getItem("spotifyAccessToken") || "");
-    const [refreshToken, setRefreshToken] = useState(localStorage.getItem("spotifyRefreshToken") || "");
+    const { UaccessToken } = useSelector((state) => state.userauth);
     const dispatch = useDispatch();
+const { userauth } = useSelector((state) => state.userauth); 
     const spotifyAuthUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user-read-private user-read-email playlist-read-private user-library-read`;
 
-    // Function to exchange code for access token
+    
     const fetchAccessToken = async (code) => {
         try {
             const response = await fetch("https://accounts.spotify.com/api/token", {
@@ -43,13 +43,12 @@ const LoginDialog = ({ open, handleClose }) => {
             const data = await response.json();
 
             if (data.access_token) {
-                setAccessToken(data.access_token);
-                setRefreshToken(data.refresh_token);
 
                 localStorage.setItem("spotifyAccessToken", data.access_token);
                 localStorage.setItem("spotifyRefreshToken", data.refresh_token);
                 localStorage.setItem("spotifyExpiresAt", Date.now() + data.expires_in * 1000);
-                dispatch(setAuth({ userauth: true }));
+                localStorage.setItem("logedIn", true);
+                dispatch(setAuth({ userauth: true, UaccessToken: data.access_token }));
 
                 handleClose();
             }
@@ -58,41 +57,14 @@ const LoginDialog = ({ open, handleClose }) => {
         }
     };
 
-    // Function to refresh access token
-    const refreshAccessToken = async () => {
-        if (!refreshToken) return;
-        try {
-            const response = await fetch("https://accounts.spotify.com/api/token", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                    Authorization: "Basic " + btoa(`${clientId}:${clientSecret}`)
-                },
-                body: new URLSearchParams({
-                    grant_type: "refresh_token",
-                    refresh_token: refreshToken,
-                }),
-            });
 
-            const data = await response.json();
-            console.log("New Access Token:", data.access_token);
-
-            if (data.access_token) {
-                setAccessToken(data.access_token);
-                localStorage.setItem("spotifyAccessToken", data.access_token);
-                localStorage.setItem("spotifyExpiresAt", Date.now() + data.expires_in * 1000);
-            }
-        } catch (error) {
-            console.error("Error refreshing access token:", error);
-        }
-    };
 
     // Check for authorization code in URL and fetch token
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const authCode = urlParams.get("code");
-
-        if (authCode && !accessToken) {
+        
+        if (authCode && !UaccessToken) {
             fetchAccessToken(authCode);
         }
     }, []);

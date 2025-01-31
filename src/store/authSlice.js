@@ -18,10 +18,12 @@ const userauth = createSlice({
   name: "userauth",
   initialState: {
     userauth: false,
+    UaccessToken: null
   },
   reducers:{
     setAuth: (state, action) =>{
       state.userauth = action.payload.userauth;
+      state.UaccessToken = action.payload.UaccessToken;
     }
   }
 });

@@ -1,18 +1,14 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { styled, alpha } from "@mui/material/styles";
-import {
-  AppBar,
-  Box,
-  Toolbar,
-  Typography,
-  InputBase,
-  Button,
-} from "@mui/material";
+import { AppBar, Box, Toolbar, Typography, InputBase, Button, } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import LoginDialog from "./LoginDialog";
 import { useSelector } from "react-redux";
 import { AuthenticationContext, SessionContext } from '@toolpad/core/AppProvider';
 import { Account } from '@toolpad/core/Account';
+import { useDispatch } from "react-redux";
+import { setAuth } from "../store/authSlice";
+
 
 // Styled Search Component
 const Search = styled("div")(({ theme }) => ({
@@ -60,30 +56,78 @@ const demoSession = {
     image: 'https://avatars.githubusercontent.com/u/19550456',
   },
 };
+const fetchUserData = async (UaccessToken) => {
+  try {
+    const response = await fetch("https://api.spotify.com/v1/me", {
+      headers: {
+        Authorization: `Bearer ${UaccessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch user data");
+    }
+
+    const userData = await response.json();
+
+    return {
+      name: userData.display_name,
+      email: userData.email,
+      image: userData.images?.[0]?.url || "",
+    };
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    return null;
+  }
+};
+
+
 function Navbar({ setSearchResults }) {
   const [searchQuery, setSearchQuery] = useState("");
-  const { accessToken, expiresAt } = useSelector((state) => state.auth);
-  const { userauth } = useSelector((state) => state.userauth);
+  const { accessToken, expiresAt } = useSelector((state) => state.auth); // using the access token to search the songs
+  const { userauth, UaccessToken } = useSelector((state) => state.userauth); // the ans is true or false
   const [open, setOpen] = useState(false);
 
-  const [session, setSession] = React.useState(demoSession);
+  const dispatch = useDispatch();
+  const [data, setdata] = useState(null);
+  const [session, setSession] = React.useState(null);
+
   const authentication = React.useMemo(() => {
     return {
       signIn: () => {
-        setSession(demoSession);
+        setOpen(true)
+        if (data) {
+          setSession({ user: data });
+
+        }
       },
       signOut: () => {
         setSession(null);
+        localStorage.removeItem("logedIn");
+        localStorage.removeItem("spotifyAccessToken");
+        localStorage.removeItem("spotifyExpiresAt");
+        localStorage.removeItem("spotifyRefreshToken");
+        dispatch(setAuth({ userauth: false }));
+
       },
     };
   }, []);
 
+
   const handleClose = () => {
-    setOpen(false)
-    // setLogout(true);
+    setOpen(false);
 
   }
-
+  useEffect(() => {
+    if (UaccessToken) {
+      fetchUserData(UaccessToken).then((userData) => {
+        if (userData) {
+          setdata(userData);
+          setSession({ user: userData }); // Ensure session format
+        }
+      });
+    }
+  }, [UaccessToken]);
   // Debounced search function
   useEffect(() => {
     if (!accessToken || !searchQuery) return;
@@ -108,7 +152,7 @@ function Navbar({ setSearchResults }) {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar sx={{ justifyContent: "space-between" }}>
-          
+
           <Typography
             variant="h6"
             sx={{
@@ -135,21 +179,18 @@ function Navbar({ setSearchResults }) {
                 inputProps={{ "aria-label": "search" }}
               />
             </Search>
-            {!userauth ? (<Button color="inherit" onClick={() => setOpen(true)}>
-              <Typography variant="h6" sx={{ fontWeight: 100, fontSize: 15 }}>
-                Login
-              </Typography>
-            </Button>) : (<Typography variant="h6" sx={{ fontWeight: 100, fontSize: 15 }}><AuthenticationContext.Provider value={authentication}>
+
+            <Typography variant="h6" sx={{ fontWeight: 100, fontSize: 15 }}><AuthenticationContext.Provider value={authentication} >
               <SessionContext.Provider value={session}>
                 {/* preview-start */}
                 <Account />
                 {/* preview-end */}
               </SessionContext.Provider>
-            </AuthenticationContext.Provider> </Typography>)}
-          <LoginDialog open={open} handleClose={handleClose} />
-        </Box>
-      </Toolbar>
-    </AppBar>
+            </AuthenticationContext.Provider> </Typography>
+            <LoginDialog open={open} handleClose={handleClose} />
+          </Box>
+        </Toolbar>
+      </AppBar>
     </Box >
   );
 }
