@@ -111,7 +111,7 @@ function Navbar({ setSearchResults }) {
 
 
   const handleClose = () => {
-    navigate('/');
+    navigate('/Streamusic');
     setOpen(false);
   }
   useEffect(() => {
