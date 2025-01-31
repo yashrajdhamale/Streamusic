@@ -185,7 +185,7 @@ function App() {
           <Grid size={12}>
             <Navbar setSearchResults={setSearchResults} />
           </Grid>
-          {/* {windowSize.width < 600 ? (
+          {windowSize.width < 600 ? (
             <Stack spacing={2}>
               <Grid size={changedwidow ? 12 : 6}>
                 <ListOFSearchedSong searchResults={searchResults} setQueue={setQueue} setFinalClose={setFinalClose} />
@@ -210,7 +210,7 @@ function App() {
               onNext={handleNextSong}
               onPrev={handlePrevSong}
             />
-          </Grid> */}
+          </Grid>
         </Grid>
       </Box>
     </>

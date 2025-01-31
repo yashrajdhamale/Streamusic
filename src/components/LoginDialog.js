@@ -16,7 +16,7 @@ import { useSelector } from "react-redux";
 
 const clientId = process.env.REACT_APP_CLIENT_ID;
 const clientSecret = process.env.REACT_APP_CLIENT_SECRET;
-const redirectUri = "http://localhost:3000/Streamusic/callback";
+const redirectUri = process.env.REACT_APP_REDIRECT_URI;
 
 const LoginDialog = ({ open, handleClose }) => {
     const { UaccessToken } = useSelector((state) => state.userauth);
