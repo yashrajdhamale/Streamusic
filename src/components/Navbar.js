@@ -8,7 +8,7 @@ import { AuthenticationContext, SessionContext } from '@toolpad/core/AppProvider
 import { Account } from '@toolpad/core/Account';
 import { useDispatch } from "react-redux";
 import { setAuth } from "../store/authSlice";
-
+import { useNavigate } from "react-router-dom";
 
 // Styled Search Component
 const Search = styled("div")(({ theme }) => ({
@@ -77,6 +77,7 @@ const fetchUserData = async (UaccessToken) => {
 
 
 function Navbar({ setSearchResults }) {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const { accessToken, expiresAt } = useSelector((state) => state.auth); // using the access token to search the songs
   const { userauth, UaccessToken } = useSelector((state) => state.userauth); // the ans is true or false
@@ -110,8 +111,8 @@ function Navbar({ setSearchResults }) {
 
 
   const handleClose = () => {
+    navigate('/');
     setOpen(false);
-
   }
   useEffect(() => {
     if (UaccessToken) {

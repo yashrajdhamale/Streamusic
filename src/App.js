@@ -82,7 +82,7 @@ function App() {
         document.cookie = `spotify_access_token=${accessToken}; path=/; max-age=${expiresAt}; Secure; SameSite=None`;
         document.cookie = `spotifyAppExpiresAt=${expiresAt}; path=/; max-age=${expiresAt}; Secure; SameSite=None`;
         // Save to Redux
-        dispatch(setToken({ accessToken, expiresAt }));
+        dispatch(setToken({ accessToken: accessToken, expiresAt }));
       } else {
         console.error("Failed to get access token:", data);
       }
@@ -93,11 +93,12 @@ function App() {
 
   const getToken = async () => {
     const storedToken = getCookie("spotify_access_token");
+    const expiresAt = parseInt(getCookie('spotifyAppExpiresAt'), 10);
     if (storedToken) {
-      const expiresAt = parseInt(getCookie('spotifyAppExpiresAt'), 10);
       if (Date.now() < expiresAt) {
         // If token is still valid, update Redux & return
-        dispatch(setToken({ storedToken, expiresAt }));
+        dispatch(setToken({ accessToken: storedToken, expiresAt }));
+
         return;
       }
     }
