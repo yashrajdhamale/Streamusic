@@ -10,13 +10,15 @@ function MusicPlayer({ song, onPrev, onNext }) {
   const [isSeeking, setIsSeeking] = useState(false);
   const playerRef = useRef(null);
 
+  const youtubekey = process.env.REACT_APP_YOUTUBEKEY;
+
   const fetchVideoId = async () => {
     const query = song?.name || song?.title; // Check for both 'name' and 'title'
     if (!query) return;
 
     try {
       const response = await fetch(
-        `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&key=AIzaSyB8xe-pC_uYbBOdQ9_JldZxJHyZyxGZ2gU&type=video&maxResults=1&videoCategoryId=10`
+        `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&key=${youtubekey}&type=video&maxResults=1&videoCategoryId=10`
       );
       const data = await response.json();
       const fetchedVideoId = data.items?.[0]?.id?.videoId;

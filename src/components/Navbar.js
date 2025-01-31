@@ -49,13 +49,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 
-const demoSession = {
-  user: {
-    name: 'Bharat Kashyap',
-    email: 'bharatkashyap@outlook.com',
-    image: 'https://avatars.githubusercontent.com/u/19550456',
-  },
-};
+
 const fetchUserData = async (UaccessToken) => {
   try {
     const response = await fetch("https://api.spotify.com/v1/me", {
