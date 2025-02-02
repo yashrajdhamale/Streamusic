@@ -21,17 +21,17 @@ export default function SearchedSong({ searchResults, setQueue }) {
     const loading = useSelector((state) => state.loading.loading);
     const convertYouTubeDurationToMS = (duration) => {
         const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
-    
+
         const hours = match[1] ? parseInt(match[1]) : 0;
         const minutes = match[2] ? parseInt(match[2]) : 0;
         const seconds = match[3] ? parseInt(match[3]) : 0;
-    
+
         // Convert to milliseconds
         const totalMilliseconds = (hours * 60 * 60 + minutes * 60 + seconds) * 1000;
-        
+
         return totalMilliseconds;
     };
-    
+
 
     const fetchTrendingSongs = async () => {
         const apiKey = process.env.REACT_APP_YOUTUBEKEY;
@@ -67,8 +67,12 @@ export default function SearchedSong({ searchResults, setQueue }) {
         fetchTrendingSongs();
     }, []);
 
-    const addToQueue = (song) => {
-        setQueue((prevQueue) => [...prevQueue, song]);
+    const addToQueue = (song, isChecked) => {
+        setQueue((prevQueue) =>
+            isChecked
+                ? [...prevQueue, song] // Add if checked
+                : prevQueue.filter((s) => s.id !== song.id) // Remove if unchecked
+        );
     };
 
     return (
@@ -111,8 +115,9 @@ export default function SearchedSong({ searchResults, setQueue }) {
                                                         </React.Fragment>
                                                     }
                                                 />
+
                                                 <Checkbox
-                                                    onClick={() => addToQueue(song)}
+                                                    onClick={(e) => addToQueue(song, e.target.checked)}
                                                     color="primary"
                                                 />
                                             </ListItem>
@@ -155,7 +160,7 @@ export default function SearchedSong({ searchResults, setQueue }) {
                                                     }
                                                 />
                                                 <Checkbox
-                                                    onClick={() => addToQueue(song)}
+                                                    onClick={(e) => addToQueue(song, e.target.checked)}
                                                     color="primary"
                                                 />
                                             </ListItem>

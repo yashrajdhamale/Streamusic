@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { styled, alpha } from "@mui/material/styles";
-import { AppBar, Box, Toolbar, Typography, InputBase,  } from "@mui/material";
+import { AppBar, Box, Toolbar, Typography, InputBase, Button } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import LoginDialog from "./LoginDialog";
 import { AuthenticationContext, SessionContext } from '@toolpad/core/AppProvider';
@@ -10,6 +10,7 @@ import { setAuth } from "../store/authSlice";
 import { useNavigate } from "react-router-dom";
 import { setQuery } from '../store/searchQuerySlice.js';
 import { setLoading } from "../store/loadingSlice.js";
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -168,6 +169,9 @@ function Navbar({ setSearchResults }) {
             PACK PLAYER
           </Typography>
 
+          <Button variant="text" color="white" startIcon={<FavoriteIcon />}>
+            Liked Songs
+          </Button>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Search>
               <SearchIconWrapper>

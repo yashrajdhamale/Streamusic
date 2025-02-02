@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { debounce } from 'lodash';
 import { setAuth, setToken } from "./store/authSlice";
 import { setWindow } from "./store/changewindowSlice";
+import LikedSongs from './components/LikedSongs';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: '#fff',
@@ -184,18 +185,21 @@ function App() {
           <Grid size={12}>
             <Navbar setSearchResults={setSearchResults} />
           </Grid>
-          {windowSize.width < 600 ? (
+          {/* <Grid size={12}>
+            <LikedSongs />
+          </Grid> */}
+          {windowSize.width < 650 ? (
             <Stack spacing={2}>
-              <Grid size={changewindow ? 12 : 6}>
+              <Grid size={12}>
                 <ListOFSearchedSong searchResults={searchResults} setQueue={setQueue} />
               </Grid>
-              <Grid size={changewindow ? 12 : 6}>
+              <Grid size={12}>
                 <QueuedSongs onSongSelect={setCurrentSong} queuedSong={queuedSong} />
               </Grid>
             </Stack>
           ) : (
             <>
-              <Grid size={!changewindow && queuedSong.length === 0 ? 12 : 6}>
+              <Grid size={queuedSong.length === 0 ? 12 : 6}>
                 <ListOFSearchedSong searchResults={searchResults} setQueue={setQueue} />
               </Grid>
               <Grid size={6}>
@@ -203,13 +207,13 @@ function App() {
               </Grid>
             </>
           )}
-          <Grid size={12}>
+          {/* <Grid size={12}>
             <MusicPlayer
               song={currentSong}
               onNext={handleNextSong}
               onPrev={handlePrevSong}
             />
-          </Grid>
+          </Grid> */}
         </Grid>
       </Box>
     </>
