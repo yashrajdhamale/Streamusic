@@ -8,12 +8,10 @@ import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid2';
-import { useDispatch } from "react-redux";
-
+import { useDispatch, useSelector } from "react-redux";
 import { debounce } from 'lodash';
-
-import { setAuth } from "./store/authSlice";
-import { setToken } from "./store/authSlice";
+import { setAuth, setToken } from "./store/authSlice";
+import { setWindow } from "./store/changewindowSlice";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: '#fff',
@@ -34,14 +32,12 @@ function getCookie(name) {
 }
 
 function App() {
+  const dispatch = useDispatch();
   const [currentSong, setCurrentSong] = useState(null);
   const [queuedSong, setQueue] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
-  const [changedwidow, setChangedwindow] = useState(false);
-  const [finalclose, setFinalClose] = useState(false);
 
-
-  const dispatch = useDispatch();
+  const changewindow = useSelector((state) => state.changewindow.changewindow);
 
 
   const [windowSize, setWindowSize] = useState({
@@ -54,7 +50,7 @@ function App() {
       width: window.innerWidth,
       height: window.innerHeight,
     });
-    setChangedwindow(true);
+    dispatch(setWindow({ changewindow: true }));
   }, 200); // 200ms debounce delay
 
   //function for our app to use search feature or app access token
@@ -78,7 +74,7 @@ function App() {
         const expiresAt = Date.now() + data.expires_in * 1000;
         const accessToken = data.access_token;
 
-        
+
         document.cookie = `spotify_access_token=${accessToken}; path=/; max-age=${expiresAt}; Secure; SameSite=None`;
         document.cookie = `spotifyAppExpiresAt=${expiresAt}; path=/; max-age=${expiresAt}; Secure; SameSite=None`;
         // Save to Redux
@@ -157,14 +153,13 @@ function App() {
   }, []);
 
 
-
   useEffect(() => {
     window.addEventListener('resize', handleResize);
 
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, [handleResize]);
+  }, [handleResize, queuedSong]);
 
 
 
@@ -191,19 +186,19 @@ function App() {
           </Grid>
           {windowSize.width < 600 ? (
             <Stack spacing={2}>
-              <Grid size={changedwidow ? 12 : 6}>
-                <ListOFSearchedSong searchResults={searchResults} setQueue={setQueue} setFinalClose={setFinalClose} />
+              <Grid size={changewindow ? 12 : 6}>
+                <ListOFSearchedSong searchResults={searchResults} setQueue={setQueue} />
               </Grid>
-              <Grid size={changedwidow ? 12 : 6}>
+              <Grid size={changewindow ? 12 : 6}>
                 <QueuedSongs onSongSelect={setCurrentSong} queuedSong={queuedSong} />
               </Grid>
             </Stack>
           ) : (
             <>
-              <Grid size={queuedSong.length == 0 ? 12 : 6}>
-                <ListOFSearchedSong searchResults={searchResults} setQueue={setQueue} setFinalClose={setFinalClose} />
+              <Grid size={!changewindow && queuedSong.length === 0 ? 12 : 6}>
+                <ListOFSearchedSong searchResults={searchResults} setQueue={setQueue} />
               </Grid>
-              <Grid size={finalclose ? 12 : 6}>
+              <Grid size={6}>
                 <QueuedSongs onSongSelect={setCurrentSong} queuedSong={queuedSong} />
               </Grid>
             </>

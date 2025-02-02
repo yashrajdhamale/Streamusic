@@ -1,16 +1,16 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { styled, alpha } from "@mui/material/styles";
-import { AppBar, Box, Toolbar, Typography, InputBase, Button, } from "@mui/material";
+import { AppBar, Box, Toolbar, Typography, InputBase,  } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import LoginDialog from "./LoginDialog";
-import { useSelector } from "react-redux";
 import { AuthenticationContext, SessionContext } from '@toolpad/core/AppProvider';
 import { Account } from '@toolpad/core/Account';
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setAuth } from "../store/authSlice";
 import { useNavigate } from "react-router-dom";
+import { setQuery } from '../store/searchQuerySlice.js';
+import { setLoading } from "../store/loadingSlice.js";
 
-// Styled Search Component
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: theme.shape.borderRadius,
@@ -48,8 +48,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-
-
 const fetchUserData = async (UaccessToken) => {
   try {
     const response = await fetch("https://api.spotify.com/v1/me", {
@@ -78,12 +76,12 @@ const fetchUserData = async (UaccessToken) => {
 
 function Navbar({ setSearchResults }) {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
+  const dispatch = useDispatch();
+  const searchQuery = useSelector((state) => state.searchQuery.value);
   const { accessToken, expiresAt } = useSelector((state) => state.auth); // using the access token to search the songs
   const { userauth, UaccessToken } = useSelector((state) => state.userauth); // the ans is true or false
   const [open, setOpen] = useState(false);
 
-  const dispatch = useDispatch();
   const [data, setdata] = useState(null);
   const [session, setSession] = React.useState(null);
 
@@ -102,7 +100,7 @@ function Navbar({ setSearchResults }) {
         document.cookie = "spotifyAccessToken=; path=/; max-age=0; Secure; SameSite=None";
         document.cookie = "spotifyExpiresAt=; path=/; max-age=0; Secure; SameSite=None";
         document.cookie = "spotifyRefreshToken=; path=/; max-age=0; Secure; SameSite=None";
-        
+
         dispatch(setAuth({ userauth: false }));
 
       },
@@ -126,16 +124,22 @@ function Navbar({ setSearchResults }) {
   }, [UaccessToken]);
   // Debounced search function
   useEffect(() => {
-    if (!accessToken || !searchQuery) return;
+    if (!accessToken || !searchQuery) {
+      return
+    };
 
     const timer = setTimeout(async () => {
       try {
+        dispatch(setLoading(true));
         const response = await fetch(
           `https://api.spotify.com/v1/search?q=${encodeURIComponent(searchQuery)}&type=track&limit=10`,
           { headers: { Authorization: `Bearer ${accessToken}` } }
         );
         const data = await response.json();
-        if (data.tracks) setSearchResults(data.tracks.items);
+        if (data.tracks) {
+          setSearchResults(data.tracks.items);
+          dispatch(setLoading(false));
+        }
       } catch (error) {
         console.error("Error searching songs:", error);
       }
@@ -170,7 +174,7 @@ function Navbar({ setSearchResults }) {
                 <SearchIcon />
               </SearchIconWrapper>
               <StyledInputBase
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => dispatch(setQuery(e.target.value))}
                 placeholder="Search…"
                 inputProps={{ "aria-label": "search" }}
               />

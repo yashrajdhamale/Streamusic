@@ -84,20 +84,21 @@ const LoginDialog = ({ open, handleClose }) => {
             <DialogContent>
                 <TextField autoFocus margin="dense" label="Email" type="email" fullWidth />
                 <TextField margin="dense" label="Password" type="password" fullWidth />
-                <Box sx={{ textAlign: "center", mt: 2 }}>
-                    <Button variant="contained" color="success" onClick={handleSpotifyLogin}>
-                        Sign in with Spotify
+                
+                    <Button onClick={handleClose} color="secondary">
+                        Cancel
                     </Button>
-                </Box>
+                    <Button onClick={handleClose} color="primary">
+                        Login
+                    </Button>
+                
             </DialogContent>
-            <DialogActions>
-                <Button onClick={handleClose} color="secondary">
-                    Cancel
+            <Box sx={{ textAlign: "center", mt: 2 , mb: 4}}>
+                <Button variant="contained" color="success" onClick={handleSpotifyLogin}>
+                    Sign in with Spotify
                 </Button>
-                <Button onClick={handleClose} color="primary">
-                    Login
-                </Button>
-            </DialogActions>
+            </Box>
+
         </Dialog>
     );
 };
