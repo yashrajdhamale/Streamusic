@@ -10,8 +10,9 @@ import { setAuth } from "../store/authSlice";
 import { useNavigate } from "react-router-dom";
 import { setQuery } from '../store/searchQuerySlice.js';
 import { setLoading } from "../store/loadingSlice.js";
-import FavoriteIcon from '@mui/icons-material/Favorite';
-
+import QueueMusicIcon from '@mui/icons-material/QueueMusic';
+import { setOpen } from "../store/dialogSlice.js";
+import { Password } from "@mui/icons-material";
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: theme.shape.borderRadius,
@@ -75,24 +76,36 @@ const fetchUserData = async (UaccessToken) => {
 };
 
 
-function Navbar({ setSearchResults }) {
+function Navbar({ setSearchResults, setShowQueue }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const searchQuery = useSelector((state) => state.searchQuery.value);
   const { accessToken, expiresAt } = useSelector((state) => state.auth); // using the access token to search the songs
   const { userauth, UaccessToken } = useSelector((state) => state.userauth); // the ans is true or false
-  const [open, setOpen] = useState(false);
-
+  const open = useSelector((state) => state.dialog.open);
   const [data, setdata] = useState(null);
   const [session, setSession] = React.useState(null);
 
+
+
+  const logedIn = document.cookie
+    .split('; ')
+    .find(cookie => cookie.startsWith('logedIn='))
+    ?.split('=')[1] === 'true';
+  const adminLogin = document.cookie
+    .split('; ')
+    .find(cookie => cookie.startsWith('adminLogin='))
+    ?.split('=')[1] === 'true';
   const authentication = React.useMemo(() => {
     return {
       signIn: () => {
-        setOpen(true)
+        dispatch(setOpen(true));
         if (data) {
           setSession({ user: data });
 
+        }
+        else if (adminLogin) {
+          setSession({ user: { name: "Admin", email: "thepack@gmail.com" } });
         }
       },
       signOut: () => {
@@ -101,28 +114,43 @@ function Navbar({ setSearchResults }) {
         document.cookie = "spotifyAccessToken=; path=/; max-age=0; Secure; SameSite=None";
         document.cookie = "spotifyExpiresAt=; path=/; max-age=0; Secure; SameSite=None";
         document.cookie = "spotifyRefreshToken=; path=/; max-age=0; Secure; SameSite=None";
+        document.cookie = "adminLogin=; path=/; Secure; SameSite=None";
 
         dispatch(setAuth({ userauth: false }));
+        dispatch(setOpen(true));
 
       },
     };
   }, []);
 
+  const showQueue = () => {
+    setShowQueue(prevState => !prevState);
+  }
+
 
   const handleClose = () => {
     navigate('/Streamusic');
-    setOpen(false);
+    dispatch(setOpen(false));
+
+
   }
   useEffect(() => {
     if (UaccessToken) {
-      fetchUserData(UaccessToken).then((userData) => {
-        if (userData) {
-          setdata(userData);
-          setSession({ user: userData }); // Ensure session format
-        }
-      });
+        fetchUserData(UaccessToken).then((userData) => {
+            if (userData) {
+                setdata(userData);
+                setSession({ user: userData }); // Ensure session format
+                dispatch(setOpen(false));
+            }
+        });
+    } else if (adminLogin) {
+        setSession({ user: { name: "Admin", email: "thepack@gmail.com" } });
+        dispatch(setOpen(false));
+    } else {
+        dispatch(setOpen(true));
     }
-  }, [UaccessToken]);
+}, [UaccessToken, adminLogin]); // Added adminLogin dependency
+
   // Debounced search function
   useEffect(() => {
     if (!accessToken || !searchQuery) {
@@ -150,52 +178,50 @@ function Navbar({ setSearchResults }) {
   }, [searchQuery, accessToken, setSearchResults]);
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
-        <Toolbar sx={{ justifyContent: "space-between" }}>
 
-          <Typography
-            variant="h6"
-            sx={{
-              flexGrow: 1,
-              fontWeight: 100,
-              fontSize: { xs: 13, sm: 14, md: 18 },
-              whiteSpace: "nowrap",
-              overflow: "visible",
-              textOverflow: "clip",
-              minWidth: "120px",
-            }}
-          >
-            PACK PLAYER
-          </Typography>
-
-          <Button variant="text" color="white" startIcon={<FavoriteIcon />}>
-            Liked Songs
+    <AppBar position="static">
+      <Toolbar sx={{ justifyContent: "space-between" }}>
+        <Typography
+          variant="h6"
+          sx={{
+            fontWeight: 100,
+            fontSize: { xs: 13, sm: 14, md: 18 },
+            whiteSpace: "nowrap",
+            overflow: "visible",
+            textOverflow: "clip",
+            minWidth: "120px",
+          }}
+        >
+          PACK PLAYER
+        </Typography>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0 }}>
+          <Button variant="text" color="white" onClick={showQueue} sx={{ padding: 1 }}>
+            <QueueMusicIcon sx={{ margin: "auto" }} />
           </Button>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Search>
-              <SearchIconWrapper>
-                <SearchIcon />
-              </SearchIconWrapper>
-              <StyledInputBase
-                onChange={(e) => dispatch(setQuery(e.target.value))}
-                placeholder="Search…"
-                inputProps={{ "aria-label": "search" }}
-              />
-            </Search>
+          <Search>
+            <SearchIconWrapper>
+              <SearchIcon />
+            </SearchIconWrapper>
+            <StyledInputBase
+              onChange={(e) => dispatch(setQuery(e.target.value))}
+              placeholder="Search…"
+              inputProps={{ "aria-label": "search" }}
+            />
+          </Search>
 
-            <Typography variant="h6" sx={{ fontWeight: 100, fontSize: 15 }}><AuthenticationContext.Provider value={authentication} >
-              <SessionContext.Provider value={session}>
-                {/* preview-start */}
-                <Account />
-                {/* preview-end */}
-              </SessionContext.Provider>
-            </AuthenticationContext.Provider> </Typography>
-            <LoginDialog open={open} handleClose={handleClose} />
-          </Box>
-        </Toolbar>
-      </AppBar>
-    </Box >
+          <Typography variant="h6" sx={{ fontWeight: 100, fontSize: 15, padding: 1 }}><AuthenticationContext.Provider value={authentication} >
+            <SessionContext.Provider value={session}>
+              {/* preview-start */}
+              <Account />
+              {/* preview-end */}
+            </SessionContext.Provider>
+          </AuthenticationContext.Provider>
+          </Typography>
+          {!logedIn && <LoginDialog open={open} handleClose={handleClose} />}
+        </Box>
+      </Toolbar>
+    </AppBar>
+
   );
 }
 

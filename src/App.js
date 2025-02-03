@@ -13,6 +13,8 @@ import { debounce } from 'lodash';
 import { setAuth, setToken } from "./store/authSlice";
 import { setWindow } from "./store/changewindowSlice";
 import LikedSongs from './components/LikedSongs';
+import AdminQueue from './components/AdminQueue';
+import MemberQueue from './components/MemberQueue';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: '#fff',
@@ -33,13 +35,18 @@ function getCookie(name) {
 }
 
 function App() {
+  const adminLogin = document.cookie
+    .split('; ')
+    .find(cookie => cookie.startsWith('adminLogin='))
+    ?.split('=')[1] === 'true';
   const dispatch = useDispatch();
+  const open = useSelector((state) => state.dialog.open);
   const [currentSong, setCurrentSong] = useState(null);
   const [queuedSong, setQueue] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
-
   const changewindow = useSelector((state) => state.changewindow.changewindow);
 
+  const [showqueue, setShowQueue] = useState(false);
 
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
@@ -180,41 +187,56 @@ function App() {
 
   return (
     <>
-      <Box sx={{ flexGrow: 1 }}>
-        <Grid container spacing={1}>
-          <Grid size={12}>
-            <Navbar setSearchResults={setSearchResults} />
-          </Grid>
-          {/* <Grid size={12}>
-            <LikedSongs />
-          </Grid> */}
-          {windowSize.width < 650 ? (
-            <Stack spacing={2}>
-              <Grid size={12}>
-                <ListOFSearchedSong searchResults={searchResults} setQueue={setQueue} />
+      {/* sx={{ border: '1px dashed grey' }} */}
+      <Box component="section" >
+        {!adminLogin && (
+          <>
+            <Grid size={12}>
+              <Navbar setSearchResults={setSearchResults} setShowQueue={setShowQueue} />
+            </Grid>
+            {windowSize.width < 650 ? (
+              <Stack spacing={2}>
+                <Grid size={12}>
+                  {showqueue && <MemberQueue />}
+                </Grid>
+                <Grid size={12}>
+                  <ListOFSearchedSong searchResults={searchResults} setQueue={setQueue} />
+                </Grid>
+                <Grid size={12}>
+                  <QueuedSongs onSongSelect={setCurrentSong} queuedSong={queuedSong} setQueue={setQueue} />
+                </Grid>
+              </Stack>
+            ) : (
+              <Grid container spacing={1}>
+                <Grid size={12}>
+                  {showqueue && <MemberQueue />}
+                </Grid>
+                <Grid size={queuedSong.length === 0 ? 12 : 6}>
+                  <ListOFSearchedSong searchResults={searchResults} setQueue={setQueue} />
+                </Grid>
+                <Grid size={6}>
+                  <QueuedSongs onSongSelect={setCurrentSong} queuedSong={queuedSong} setQueue={setQueue} />
+                </Grid>
               </Grid>
-              <Grid size={12}>
-                <QueuedSongs onSongSelect={setCurrentSong} queuedSong={queuedSong} />
-              </Grid>
-            </Stack>
-          ) : (
-            <>
-              <Grid size={queuedSong.length === 0 ? 12 : 6}>
-                <ListOFSearchedSong searchResults={searchResults} setQueue={setQueue} />
-              </Grid>
-              <Grid size={6}>
-                <QueuedSongs onSongSelect={setCurrentSong} queuedSong={queuedSong} />
-              </Grid>
-            </>
-          )}
-          {/* <Grid size={12}>
-            <MusicPlayer
-              song={currentSong}
-              onNext={handleNextSong}
-              onPrev={handlePrevSong}
-            />
-          </Grid> */}
-        </Grid>
+            )}
+          </>)}
+
+        {adminLogin && (
+          <Grid container spacing={2}>
+            <Grid size={12}>
+              <Navbar setSearchResults={setSearchResults} setShowQueue={setShowQueue} />
+            </Grid>
+            <Grid size={12}>
+              {showqueue && <AdminQueue />}
+            </Grid>
+            <Grid size={queuedSong.length === 0 ? 12 : 6}>
+              <ListOFSearchedSong searchResults={searchResults} setQueue={setQueue} />
+            </Grid>
+            <Grid size={6}>
+              <QueuedSongs onSongSelect={setCurrentSong} queuedSong={queuedSong} setQueue={setQueue} />
+            </Grid>
+          </Grid>)}
+
       </Box>
     </>
   );

@@ -6,7 +6,6 @@ import { useSelector } from 'react-redux';
 export default function LikedSongs() {
     const [likedSongs, setLikedSongs] = useState([]);
     const { userauth, UaccessToken } = useSelector((state) => state.userauth);
-    console.log(likedSongs);
     useEffect(() => {
         const fetchLikedSongs = async () => {
             const url = `https://api.spotify.com/v1/me/tracks`;
