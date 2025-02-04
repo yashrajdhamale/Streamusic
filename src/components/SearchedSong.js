@@ -39,40 +39,58 @@ export default function SearchedSong({ searchResults, setQueue }) {
 
         return totalMilliseconds;
     };
+    const apiKeys = [
+        'AIzaSyB8xe-pC_uYbBOdQ9_JldZxJHyZyxGZ2gU',
+        'AIzaSyDDd6PlacJnbdjmAThQ-P1h2q1mopxphcc',
+        'AIzaSyAMMZLJ7ATjIYAdz-atxV-vPv1e1xumFRc',
+        'AIzaSyCm7wv1C0aPDlGK3OPUfYVGIEcCXG3Sk54',
+        'AIzaSyDlgGSs2w32aedBgJ5PLbvIurfTBH7T0P8',
+        'AIzaSyDH_Q0cvzezf5JMROkPzMMOA_PkE5qpMFY',
+        'AIzaSyDb1i8QG2CVrsmyP-6aUaLo1_M4W4f8yzU',
+        'AIzaSyCI6-RU1-yZF_oIDbWmV9zrMhKdznPgtxY',
+        'AIzaSyDRfXr8A16LH1Upyod1p3uwm-JSiBRk84Y'
+    ];
 
+    const fetchTrendingSongs = async (apiKeys) => {
+        if (!apiKeys || apiKeys.length === 0) return;
 
-    const fetchTrendingSongs = async () => {
-        const apiKey = process.env.REACT_APP_YOUTUBEKEY;
-        const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&chart=mostPopular&regionCode=IN&videoCategoryId=10&key=${apiKey}&maxResults=4`; // Video category ID 10 is for Music
+        for (let i = 0; i < apiKeys.length; i++) {
+            const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&chart=mostPopular&regionCode=IN&videoCategoryId=10&key=${apiKeys[i]}&maxResults=4`;
 
-        if (!apiKey) return;
+            try {
+                dispatch(setLoading(true));
+                const response = await fetch(url);
+                console.log(response);
 
-        try {
-            dispatch(setLoading(true));
-            const response = await fetch(url);
-            const data = await response.json();
-            if (data.items) {
-                const trending = data.items.map((item) => ({
-                    id: item.id,
-                    title: item.snippet.title,
-                    description: item.snippet.description,
-                    thumbnail: item.snippet.thumbnails.default.url,
-                    channelTitle: item.snippet.channelTitle,
-                    duration: convertYouTubeDurationToMS(item.contentDetails.duration),
-                }));
+                if (response.ok) {
+                    const data = await response.json();
 
-                setTrendingSongs(trending);
-                dispatch(setLoading(false));
-            } else {
-                console.error('Error fetching trending songs:', data);
+                    if (data.items) {
+                        const trending = data.items.map((item) => ({
+                            id: item.id,
+                            title: item.snippet.title,
+                            description: item.snippet.description,
+                            thumbnail: item.snippet.thumbnails.default.url,
+                            channelTitle: item.snippet.channelTitle,
+                            duration: convertYouTubeDurationToMS(item.contentDetails.duration),
+                        }));
+
+                        setTrendingSongs(trending);
+                        dispatch(setLoading(false));
+                        return; // Exit function on success
+                    }
+                }
+            } catch (error) {
+                console.error(`Error fetching trending songs with key ${apiKeys[i]}:`, error);
             }
-        } catch (error) {
-            console.error('Error during trending songs fetch:', error);
         }
+
+        console.error("All API keys have been exhausted or are invalid.");
+        dispatch(setLoading(false));
     };
 
     useEffect(() => {
-        fetchTrendingSongs();
+        fetchTrendingSongs(apiKeys);
     }, []);
 
 

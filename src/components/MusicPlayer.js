@@ -199,28 +199,46 @@ function MusicPlayer({ song, onPrev, onNext }) {
   const [isSeeking, setIsSeeking] = useState(false);
   const playerRef = useRef(null);
 
-  const youtubekey = process.env.REACT_APP_YOUTUBEKEY;
+  const apiKeys = [
+    'AIzaSyB8xe-pC_uYbBOdQ9_JldZxJHyZyxGZ2gU',
+    'AIzaSyDDd6PlacJnbdjmAThQ-P1h2q1mopxphcc',
+    'AIzaSyAMMZLJ7ATjIYAdz-atxV-vPv1e1xumFRc',
+    'AIzaSyCm7wv1C0aPDlGK3OPUfYVGIEcCXG3Sk54',
+    'AIzaSyDlgGSs2w32aedBgJ5PLbvIurfTBH7T0P8',
+    'AIzaSyDH_Q0cvzezf5JMROkPzMMOA_PkE5qpMFY',
+    'AIzaSyDb1i8QG2CVrsmyP-6aUaLo1_M4W4f8yzU',
+    'AIzaSyCI6-RU1-yZF_oIDbWmV9zrMhKdznPgtxY',
+    'AIzaSyDRfXr8A16LH1Upyod1p3uwm-JSiBRk84Y'
+  ];
 
-  const fetchVideoId = async () => {
+  const fetchVideoId = async (apiKeys) => {
     const query = song?.name || song?.title;
     if (!query) return;
 
-    try {
-      const response = await fetch(
-        `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&key=${youtubekey}&type=video&maxResults=1&videoCategoryId=10`
-      );
-      const data = await response.json();
-      const fetchedVideoId = data.items?.[0]?.id?.videoId;
-      if (fetchedVideoId) {
-        setVideoId(fetchedVideoId);
+    for (let i = 0; i < apiKeys.length; i++) {
+      try {
+        const response = await fetch(
+          `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&key=${apiKeys[i]}&type=video&maxResults=1&videoCategoryId=10`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          const fetchedVideoId = data.items?.[0]?.id?.videoId;
+          if (fetchedVideoId) {
+            setVideoId(fetchedVideoId);
+            return; // Exit the function if successful
+          }
+        }
+      } catch (error) {
+        console.error(`Error fetching video ID with key ${apiKeys[i]}:`, error);
       }
-    } catch (error) {
-      console.error("Error fetching video ID:", error);
     }
+
+    console.error("All API keys have been exhausted or are invalid.");
   };
 
+
   useEffect(() => {
-    fetchVideoId();
+    fetchVideoId(apiKeys);
   }, [song]);
 
   useEffect(() => {
