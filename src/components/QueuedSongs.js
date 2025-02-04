@@ -8,7 +8,7 @@ import { get } from 'lodash';
 import { setUserQueueCount } from "../store/usercountSlice.js";
 
 
-function QueuedSongs({ onSongSelect, queuedSong, setQueue }) {
+function QueuedSongs({ onSongSelect, queuedSong, setQueue,adminLogin }) {
     const dispatch = useDispatch();
     const count = useSelector((state) => state.userqueuecount.userqueuecount);
     const queueCount = parseInt(document.cookie
@@ -27,17 +27,30 @@ function QueuedSongs({ onSongSelect, queuedSong, setQueue }) {
             body: JSON.stringify({ songs: queuedSongs }), // ✅ Correct JSON format
         });
     };
-
     const handleaddtoQueue = () => {
         if (queuedSong.length <= 5) {
             document.cookie = `queueCount=${count + queueCount}; max-age=${6 * 60 * 60}; path=/; secure; SameSite=None`;
             dispatch(setUserQueueCount(0));
             sendToQueue(queuedSong);
             setQueue([]); // Clear the queue
-
+            
         }
     };
-
+    const handleaddtoQueueAdmin = () => {
+        if (queuedSong.length >=1) {
+            document.cookie = `queueCount=0;path=/; secure; SameSite=None`;
+            sendToQueue(queuedSong);
+            setQueue([]); // Clear the queue
+        }
+    };
+    
+    const handleQueueClick = () => {
+        if (adminLogin) {
+            handleaddtoQueueAdmin();
+        } else {
+            handleaddtoQueue();
+        }
+    };
     const converTominutes = (ms) => {
         const minutes = Math.floor(ms / 60000);
         const seconds = ((ms % 60000) / 1000).toFixed(0);
@@ -47,6 +60,8 @@ function QueuedSongs({ onSongSelect, queuedSong, setQueue }) {
     return (
         <Stack spacing={3} sx={{ width: "100%", bgcolor: "background.paper", p: 2 }}>
 
+
+            <Button>Selected Songs</Button>
             <Box sx={{
                 maxHeight: "400px",  // Adjust height as needed
                 overflowY: "auto",
@@ -56,9 +71,6 @@ function QueuedSongs({ onSongSelect, queuedSong, setQueue }) {
             }}>
 
                 <List sx={{ width: "100%" }}>
-                    <Typography variant="h6" color="text.primary">
-                        Selected Songs
-                    </Typography>
                     {queuedSong.map((song, index) => {
                         const track = song.track || {};
                         const title = song.name || song.title || "Unknown Title";
@@ -98,7 +110,7 @@ function QueuedSongs({ onSongSelect, queuedSong, setQueue }) {
             <Button
                 variant="contained"
                 startIcon={<QueueMusicIcon />}
-                onClick={handleaddtoQueue}
+                onClick={handleQueueClick}
                 sx={{ alignSelf: "center", mt: 2 }}
             >
                 Add to Queue

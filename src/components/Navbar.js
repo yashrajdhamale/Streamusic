@@ -110,10 +110,10 @@ function Navbar({ setSearchResults, setShowQueue }) {
       },
       signOut: () => {
         setSession(null);
-        document.cookie = "logedIn=; path=/; max-age=0; Secure; SameSite=None";
+        document.cookie = "logedIn=; path=/;  Secure; SameSite=None";
         document.cookie = "spotifyAccessToken=; path=/; max-age=0; Secure; SameSite=None";
-        document.cookie = "spotifyExpiresAt=; path=/; max-age=0; Secure; SameSite=None";
-        document.cookie = "spotifyRefreshToken=; path=/; max-age=0; Secure; SameSite=None";
+        document.cookie = "spotifyExpiresAt=; path=/; Secure; SameSite=None";
+        document.cookie = "spotifyRefreshToken=; path=/;  Secure; SameSite=None";
         document.cookie = "adminLogin=; path=/; Secure; SameSite=None";
 
         dispatch(setAuth({ userauth: false }));
@@ -136,20 +136,20 @@ function Navbar({ setSearchResults, setShowQueue }) {
   }
   useEffect(() => {
     if (UaccessToken) {
-        fetchUserData(UaccessToken).then((userData) => {
-            if (userData) {
-                setdata(userData);
-                setSession({ user: userData }); // Ensure session format
-                dispatch(setOpen(false));
-            }
-        });
+      fetchUserData(UaccessToken).then((userData) => {
+        if (userData) {
+          setdata(userData);
+          setSession({ user: userData }); // Ensure session format
+          dispatch(setOpen(false));
+        }
+      });
     } else if (adminLogin) {
-        setSession({ user: { name: "Admin", email: "thepack@gmail.com" } });
-        dispatch(setOpen(false));
+      setSession({ user: { name: "Admin", email: "thepack@gmail.com" } });
+      dispatch(setOpen(false));
     } else {
-        dispatch(setOpen(true));
+      dispatch(setOpen(true));
     }
-}, [UaccessToken, adminLogin]); // Added adminLogin dependency
+  }, [UaccessToken, adminLogin]); // Added adminLogin dependency
 
   // Debounced search function
   useEffect(() => {

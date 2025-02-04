@@ -49,9 +49,9 @@ const LoginDialog = ({ open, handleClose }) => {
                 const expiresIn = data.expires_in * 1000;  // Convert to milliseconds
                 // Secure;
                 document.cookie = `spotifyAccessToken=${data.access_token}; path=/; max-age=${data.expires_in}; Secure; SameSite=None`;
-                document.cookie = `spotifyRefreshToken=${data.refresh_token}; path=/; max-age=${data.expires_in}; Secure;SameSite=None`;
-                document.cookie = `spotifyExpiresAt=${Date.now() + expiresIn}; path=/; max-age=${data.expires_in};  Secure;SameSite=None`;
-                document.cookie = `logedIn=true; path=/; max-age=${data.expires_in}; Secure; SameSite=None`;
+                document.cookie = `spotifyRefreshToken=${data.refresh_token}; path=/; Secure;SameSite=None`;
+                document.cookie = `spotifyExpiresAt=${Date.now() + expiresIn}; path=/; Secure; SameSite=None`;
+                document.cookie = `logedIn=true; path=/; Secure; SameSite=None`;
                 document.cookie = `adminLogin=false; path=/; Secure; SameSite=None`;
 
                 dispatch(setAuth({ userauth: true, UaccessToken: data.access_token }));

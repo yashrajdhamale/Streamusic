@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import {
     Stack, Typography, List, ListItem, ListItemAvatar, ListItemText,
-    Avatar, Divider, Box, CircularProgress, Skeleton
+    Avatar, Divider, Box, CircularProgress, Skeleton,
+    Button
 } from "@mui/material";
 import ClearIcon from '@mui/icons-material/Clear';
 import MusicPlayer from "./MusicPlayer"; // Import MusicPlayer
@@ -59,36 +60,34 @@ export default function AdminQueue() {
             setCurrentSong(queue[currentIndex - 1]);
         }
     };
-    const removeFromQueue = async () => {
-        const currentIndex = queue.findIndex(s => s.name === currentSong?.name);
-        if (currentIndex > -1) {
-          // Remove the song from the local queue
-          const updatedQueue = queue.filter((_, index) => index !== currentIndex);
-          setQueue(updatedQueue); // Update the local queue state
-          setCurrentSong(null); // Clear the current song
-      
-          // Call the backend to remove the song from the server-side queue
-          try {
-            const response = await fetch('https://streamusic-backend.onrender.com/queue/remove', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ songId: queue[currentIndex].id }), // Send the songId
-            });
-      
-            const data = await response.json();
-            if (data.message === "Song removed from queue") {
-            } else {
-              // Handle failure response
-              console.error("Failed to remove song from backend.");
-            }
-          } catch (error) {
-            console.error("Error removing song from backend:", error);
-          }
+    const removeFromQueue = async (song) => {
+        const updatedQueue = queue.filter((s) => s.id !== song.id);
+        setQueue(updatedQueue); // Update the local queue state
+
+        if (currentSong?.id === song.id) {
+            setCurrentSong(null); // Clear the player if the removed song was playing
         }
-      };
-      
+
+        // Call the backend to remove the song from the server-side queue
+        try {
+            const response = await fetch('https://streamusic-backend.onrender.com/queue/remove', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ songId: song.id }), // Send the song ID
+            });
+
+            const data = await response.json();
+            if (data.message !== "Song removed from queue") {
+                console.error("Failed to remove song from backend.");
+            }
+        } catch (error) {
+            console.error("Error removing song from backend:", error);
+        }
+    };
+
+
 
     return (
         <Stack spacing={2} sx={{ width: "100%", bgcolor: "background.paper", p: 2 }}>
@@ -117,18 +116,20 @@ export default function AdminQueue() {
                                 <React.Fragment key={index}>
                                     <ListItem
                                         alignItems="flex-start"
-                                        sx={{ p: 1, cursor: "pointer", bgcolor: song === currentSong ? "#e0e0e0" : "transparent" }}
-                                        onClick={() => handleSongSelect(song)}
+                                        sx={{ p: 0, cursor: "pointer", bgcolor: song === currentSong ? "#e0e0e0" : "transparent" }}
+
                                     >
                                         <ListItemAvatar>
                                             {image ? <Avatar alt={title} src={image} /> : <Skeleton variant="circular" width={40} height={40} />}
                                         </ListItemAvatar>
                                         <ListItemText
-                                            primary={title}
+                                            primary={title} onClick={() => handleSongSelect(song)}
                                             secondary={<Typography variant="body2" color="text.secondary">{artist}</Typography>}
                                         />
-                                        <ClearIcon
-                                            onClick={(event) => removeFromQueue(event, song)} sx={{ width: "40px", height: "40px" }} />
+                                        <Button onClick={() => removeFromQueue(song)}>
+                                            <ClearIcon sx={{ width: "40px", height: "40px" }} />
+                                        </Button>
+
                                     </ListItem>
                                     <Divider variant="inset" component="li" />
                                 </React.Fragment>
@@ -139,7 +140,7 @@ export default function AdminQueue() {
             )}
 
             {/* Music Player Component */}
-            {currentSong && <MusicPlayer song={currentSong} onPrev={handlePrev} onNext={handleNext} />}
+            {currentSong && <MusicPlayer song={currentSong} onPrev={handlePrev} onNext={handleNext}  />}
         </Stack>
     );
 }
