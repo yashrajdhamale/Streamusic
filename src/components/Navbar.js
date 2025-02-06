@@ -50,31 +50,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const fetchUserData = async (UaccessToken) => {
-  try {
-    const response = await fetch("https://api.spotify.com/v1/me", {
-      headers: {
-        Authorization: `Bearer ${UaccessToken}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch user data");
-    }
-
-    const userData = await response.json();
-
-    return {
-      name: userData.display_name,
-      email: userData.email,
-      image: userData.images?.[0]?.url || "",
-    };
-  } catch (error) {
-    console.error("Error fetching user data:", error);
-    return null;
-  }
-};
-
 
 function Navbar({ setSearchResults, setShowQueue }) {
   const navigate = useNavigate();
@@ -87,6 +62,29 @@ function Navbar({ setSearchResults, setShowQueue }) {
   const [session, setSession] = React.useState(null);
 
 
+  const fetchUserData = async (UaccessToken) => {
+    try {
+      const response = await fetch("https://api.spotify.com/v1/me", {
+        headers: {
+          Authorization: `Bearer ${UaccessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch user data");
+      }
+
+      const userData = await response.json();
+      return {
+        name: userData.display_name,
+        email: userData.email,
+        image: userData.images?.[0]?.url || "",
+      };
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      return null;
+    }
+  };
 
   const logedIn = document.cookie
     .split('; ')
@@ -110,11 +108,11 @@ function Navbar({ setSearchResults, setShowQueue }) {
       },
       signOut: () => {
         setSession(null);
-        document.cookie = "logedIn=; path=/;  Secure; SameSite=None";
+        document.cookie = "logedIn=; path=/;  Secure;max-age=0; SameSite=None";
         document.cookie = "spotifyAccessToken=; path=/; max-age=0; Secure; SameSite=None";
-        document.cookie = "spotifyExpiresAt=; path=/; Secure; SameSite=None";
-        document.cookie = "spotifyRefreshToken=; path=/;  Secure; SameSite=None";
-        document.cookie = "adminLogin=; path=/; Secure; SameSite=None";
+        document.cookie = "spotifyExpiresAt=; path=/; max-age=0;Secure; SameSite=None";
+        document.cookie = "spotifyRefreshToken=; path=/; max-age=0; Secure; SameSite=None";
+        document.cookie = "adminLogin=; path=/; Secure;max-age=0; SameSite=None";
 
         dispatch(setAuth({ userauth: false }));
         dispatch(setOpen(true));

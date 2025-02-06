@@ -46,13 +46,13 @@ const LoginDialog = ({ open, handleClose }) => {
             const data = await response.json();
 
             if (data.access_token) {
-                const expiresIn = data.expires_in * 1000;  // Convert to milliseconds
+                const expiresIn = Date.now() + data.expires_in * 1000;  // Convert to milliseconds
                 // Secure;
                 document.cookie = `spotifyAccessToken=${data.access_token}; path=/; max-age=${data.expires_in}; Secure; SameSite=None`;
-                document.cookie = `spotifyRefreshToken=${data.refresh_token}; path=/; Secure;SameSite=None`;
-                document.cookie = `spotifyExpiresAt=${Date.now() + expiresIn}; path=/; Secure; SameSite=None`;
-                document.cookie = `logedIn=true; path=/; Secure; SameSite=None`;
-                document.cookie = `adminLogin=false; path=/; Secure; SameSite=None`;
+                document.cookie = `spotifyRefreshToken=${data.refresh_token}; path=/; max-age=${data.expires_in}; Secure; SameSite=None`;
+                document.cookie = `spotifyExpiresAt=${expiresIn}; path=/; max-age=${data.expires_in}; Secure; SameSite=None`;
+                document.cookie = `logedIn=true; path=/; max-age=${data.expires_in}; Secure; SameSite=None`;
+                document.cookie = `adminLogin=false; path=/; max-age=${data.expires_in}; Secure; SameSite=None`;
 
                 dispatch(setAuth({ userauth: true, UaccessToken: data.access_token }));
 
@@ -67,7 +67,6 @@ const LoginDialog = ({ open, handleClose }) => {
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const authCode = urlParams.get("code");
-
         if (authCode && !UaccessToken) {
             fetchAccessToken(authCode);
         }
@@ -78,22 +77,14 @@ const LoginDialog = ({ open, handleClose }) => {
         window.location.href = spotifyAuthUrl;
     };
 
-    const handleLogin = () => {
-        // Get email and password values from the refs
+    const handleAdminLogin = () => {
         const email = emailRef.current.value;
         const password = passwordRef.current.value;
-
-        // Check if the email and password are correct
         if (email === "thepack@gmail.com" && password === "packk") {
-            // Set a cookie to indicate successful admin login
-            document.cookie = "adminLogin=true; path=/; secure; SameSite=None";
-            document.cookie = "logedIn=true; path=/; secure; SameSite=None";
-            // Close the login modal (assuming handleClose does that)
+            document.cookie = `logedIn=true; path=/; max-age=${6 * 60 * 60}; Secure; SameSite=None`;
+            document.cookie = `adminLogin=true; path=/; max-age=${6 * 60 * 60}; Secure; SameSite=None`;
             handleClose();
-            // Optionally, you can redirect the user to an admin dashboard or home page
-            // window.location.href = "/admin-dashboard"; // Uncomment if you want to redirect
         } else {
-            // Handle invalid login attempt (show a message or alert)
             alert("Invalid email or password");
         }
     };
@@ -120,7 +111,7 @@ const LoginDialog = ({ open, handleClose }) => {
                     inputRef={passwordRef} // Use ref for password
                 />
 
-                <Button onClick={handleLogin} color="primary">
+                <Button onClick={handleAdminLogin} color="primary">
                     Login
                 </Button>
             </DialogContent>

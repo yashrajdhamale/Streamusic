@@ -112,8 +112,9 @@ export default function SearchedSong({ searchResults, setQueue, adminLogin }) {
             }
         });
     };
-    
+
     useEffect(() => {
+        if (!UaccessToken) return;
         const fetchLikedSongs = async () => {
             const url = `https://api.spotify.com/v1/me/tracks?limit=50`;
             const response = await fetch(url, {
@@ -129,7 +130,7 @@ export default function SearchedSong({ searchResults, setQueue, adminLogin }) {
                     artist: item.track.artists.map((artist) => artist.name).join(', '),
                     album: item.track.album.name,
                     duration: item.track.duration_ms,
-                    thumbnail: item.track.album.images[0].url,
+                    thumbnail: item.track.album.images?.[0]?.url || "",
                 }));
                 setLikedSongs(likedSongs);
             } else {
