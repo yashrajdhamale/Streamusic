@@ -109,7 +109,7 @@ export default function AdminQueue() {
                         </Typography>
                         {queue.map((song, index) => {
                             const title = song.name || song.title || "Unknown Title";
-                            const artist = song.artists?.[0]?.name || song.channelTitle || "Unknown Artist";
+                            const artist = song.artists?.[0]?.name || song.channelTitle || song.artist || "Unknown Artist";
                             const image = song.album?.images?.[0]?.url || song.thumbnail || "";
 
                             return (
@@ -140,7 +140,7 @@ export default function AdminQueue() {
             )}
 
             {/* Music Player Component */}
-            {currentSong && <MusicPlayer song={currentSong} onPrev={handlePrev} onNext={handleNext}  />}
+            {currentSong && <MusicPlayer song={currentSong} onPrev={handlePrev} onNext={handleNext} />}
         </Stack>
     );
 }

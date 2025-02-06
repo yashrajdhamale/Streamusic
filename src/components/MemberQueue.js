@@ -51,9 +51,7 @@ export default function MemberQueue() {
                     <CircularProgress style={{ color: "black" }} />
                 </Stack>
             ) : (
-                //<Typography variant="h6" color="text.primary">
-                //     Playing Songs
-                // </Typography>
+
                 <><Button > Playing Songs</Button>
                     <Box sx={{
                         maxHeight: adminLogin ? "700px" : "400px",
@@ -66,7 +64,7 @@ export default function MemberQueue() {
 
                             {queue.map((song, index) => {
                                 const title = song.name || song.title || "Unknown Title";
-                                const artist = song.artists?.[0]?.name || song.channelTitle || "Unknown Artist";
+                                const artist = song.artists?.[0]?.name || song.channelTitle || song.artist || "Unknown Artist";
                                 const image = song.album?.images?.[0]?.url || song.thumbnail || "";
 
                                 return (
