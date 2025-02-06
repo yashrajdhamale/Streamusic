@@ -5,6 +5,7 @@ import {
     Avatar, Divider, Box, CircularProgress, Skeleton,
     Button
 } from "@mui/material";
+import Alert from '@mui/material/Alert';
 import ClearIcon from '@mui/icons-material/Clear';
 import MusicPlayer from "./MusicPlayer"; // Import MusicPlayer
 
@@ -96,47 +97,47 @@ export default function AdminQueue() {
                     <CircularProgress style={{ color: "black" }} />
                 </Stack>
             ) : (
-                <Box sx={{
-                    maxHeight: adminLogin ? "700px" : "200px",
-                    overflowY: "auto",
-                    scrollbarWidth: "thin",
-                    "&::-webkit-scrollbar": { width: "8px" },
-                    "&::-webkit-scrollbar-thumb": { background: "#888", borderRadius: "4px" }
-                }}>
-                    <List sx={{ width: "100%" }}>
-                        <Typography variant="h6" color="text.primary">
-                            Playing Songs
-                        </Typography>
-                        {queue.map((song, index) => {
-                            const title = song.name || song.title || "Unknown Title";
-                            const artist = song.artists?.[0]?.name || song.channelTitle || song.artist || "Unknown Artist";
-                            const image = song.album?.images?.[0]?.url || song.thumbnail || "";
+                <>
+                    <Button>Playing Songs</Button>
+                    {queue.length > 0 ?(<Box sx={{
+                        maxHeight: adminLogin ? "700px" : "200px",
+                        overflowY: "auto",
+                        scrollbarWidth: "thin",
+                        "&::-webkit-scrollbar": { width: "8px" },
+                        "&::-webkit-scrollbar-thumb": { background: "#888", borderRadius: "4px" }
+                    }}>
+                        <List sx={{ width: "100%" }}>
 
-                            return (
-                                <React.Fragment key={index}>
-                                    <ListItem
-                                        alignItems="flex-start"
-                                        sx={{ p: 0, cursor: "pointer", bgcolor: song === currentSong ? "#e0e0e0" : "transparent" }}
+                            {queue.map((song, index) => {
+                                const title = song.name || song.title || "Unknown Title";
+                                const artist = song.artists?.[0]?.name || song.channelTitle || song.artist || "Unknown Artist";
+                                const image = song.album?.images?.[0]?.url || song.thumbnail || "";
 
-                                    >
-                                        <ListItemAvatar>
-                                            {image ? <Avatar alt={title} src={image} /> : <Skeleton variant="circular" width={40} height={40} />}
-                                        </ListItemAvatar>
-                                        <ListItemText
-                                            primary={title} onClick={() => handleSongSelect(song)}
-                                            secondary={<Typography variant="body2" color="text.secondary">{artist}</Typography>}
-                                        />
-                                        <Button onClick={() => removeFromQueue(song)}>
-                                            <ClearIcon sx={{ width: "40px", height: "40px" }} />
-                                        </Button>
+                                return (
+                                    <React.Fragment key={index}>
+                                        <ListItem
+                                            alignItems="flex-start"
+                                            sx={{ p: 0, cursor: "pointer", bgcolor: song === currentSong ? "#e0e0e0" : "transparent" }}
 
-                                    </ListItem>
-                                    <Divider variant="inset" component="li" />
-                                </React.Fragment>
-                            );
-                        })}
-                    </List>
-                </Box>
+                                        >
+                                            <ListItemAvatar>
+                                                {image ? <Avatar alt={title} src={image} /> : <Skeleton variant="circular" width={40} height={40} />}
+                                            </ListItemAvatar>
+                                            <ListItemText
+                                                primary={title} onClick={() => handleSongSelect(song)}
+                                                secondary={<Typography variant="body2" color="text.secondary">{artist}</Typography>}
+                                            />
+                                            <Button onClick={() => removeFromQueue(song)}>
+                                                <ClearIcon sx={{ width: "40px", height: "40px" }} />
+                                            </Button>
+
+                                        </ListItem>
+                                        <Divider variant="inset" component="li" />
+                                    </React.Fragment>
+                                );
+                            })}
+                        </List>
+                    </Box>):(<Alert severity="info">Add Songs First</Alert>)}</>
             )}
 
             {/* Music Player Component */}

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
+import Alert from '@mui/material/Alert';
 import {
     Stack, Typography, List, ListItem, ListItemAvatar, ListItemText,
     Avatar, Divider, Box, CircularProgress, Skeleton,
@@ -53,7 +54,7 @@ export default function MemberQueue() {
             ) : (
 
                 <><Button > Playing Songs</Button>
-                    <Box sx={{
+                    {queue.length > 0 ? (<Box sx={{
                         maxHeight: adminLogin ? "700px" : "400px",
                         overflowY: "auto",
                         scrollbarWidth: "thin",
@@ -88,7 +89,7 @@ export default function MemberQueue() {
                                 );
                             })}
                         </List>
-                    </Box></>
+                    </Box>) : (<Alert severity="info">Add Songs First</Alert>)}</>
             )}
 
         </Stack>
