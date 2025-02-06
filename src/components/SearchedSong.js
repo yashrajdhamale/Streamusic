@@ -148,57 +148,7 @@ export default function SearchedSong({ searchResults, setQueue, adminLogin }) {
     }
     return (
         <Stack spacing={1} sx={{ width: "100%", bgcolor: "background.paper", p: 2 }}>
-            {!adminLogin && (<><Button endIcon={showList ? <KeyboardArrowRightIcon /> : <KeyboardArrowDownIcon />} onClick={toggelList}>Liked Songs</Button>
-
-                <Box sx={{
-                    maxHeight: "400px",  // Adjust height as needed
-                    overflowY: "auto",
-                    scrollbarWidth: "thin", // Firefox
-                    "&::-webkit-scrollbar": { width: "8px" }, // WebKit browsers
-                    "&::-webkit-scrollbar-thumb": { background: "#888", borderRadius: "4px" }
-                }}>
-                    <List sx={{ width: "100%" }} hidden={showList}>
-                        {/* 🔍 Liked Songs Section */}
-                        {likedSongs.length > 0 && UaccessToken && (
-                            <>
-
-                                {likedSongs.map((song) => (
-                                    <React.Fragment key={song.id}>
-                                        <ListItem alignItems="flex-start" sx={{ p: 0 }}>
-                                            <ListItemAvatar>
-                                                {song.thumbnail ? (
-                                                    <Avatar alt={song.title} src={song.thumbnail} />
-                                                ) : (
-                                                    <Skeleton variant="circular" width={40} height={40} />
-                                                )}
-                                            </ListItemAvatar>
-                                            <ListItemText
-                                                primary={song.title}
-                                                secondary={
-                                                    <Typography variant="body2" color="text.secondary">
-                                                        {song.artist}
-                                                    </Typography>
-                                                }
-                                            />
-                                            <Checkbox
-                                                onClick={(e) => addToQueue(song, e.target.checked)}
-                                                color="primary"
-                                                disableRipple
-                                                disabled={!adminLogin ? queueCount + count >= MAX_QUEUE_LIMIT : false}
-
-                                            />
-
-                                        </ListItem>
-                                        <Divider variant="inset" component="li" />
-                                    </React.Fragment>
-                                ))}
-                            </>
-                        )}
-                    </List>
-                </Box> </>)}
-
             <Button endIcon={showListTS ? <KeyboardArrowRightIcon /> : <KeyboardArrowDownIcon />} onClick={toggelListTS}>{searchQuery && searchResults.length > 0 ? "Searched Results" : "Trending Songs"}</Button>
-
             {loading ? (
                 <Stack alignItems="center">
                     <CircularProgress style={{ color: "black" }} />
@@ -287,6 +237,56 @@ export default function SearchedSong({ searchResults, setQueue, adminLogin }) {
             </Box>
             </>
             )}
+            {!adminLogin && (<><Button endIcon={showList ? <KeyboardArrowRightIcon /> : <KeyboardArrowDownIcon />} onClick={toggelList}>Liked Songs</Button>
+
+                <Box sx={{
+                    maxHeight: "400px",  // Adjust height as needed
+                    overflowY: "auto",
+                    scrollbarWidth: "thin", // Firefox
+                    "&::-webkit-scrollbar": { width: "8px" }, // WebKit browsers
+                    "&::-webkit-scrollbar-thumb": { background: "#888", borderRadius: "4px" }
+                }}>
+                    <List sx={{ width: "100%" }} hidden={showList}>
+                        {/* 🔍 Liked Songs Section */}
+                        {likedSongs.length > 0 && UaccessToken && (
+                            <>
+
+                                {likedSongs.map((song) => (
+                                    <React.Fragment key={song.id}>
+                                        <ListItem alignItems="flex-start" sx={{ p: 0 }}>
+                                            <ListItemAvatar>
+                                                {song.thumbnail ? (
+                                                    <Avatar alt={song.title} src={song.thumbnail} />
+                                                ) : (
+                                                    <Skeleton variant="circular" width={40} height={40} />
+                                                )}
+                                            </ListItemAvatar>
+                                            <ListItemText
+                                                primary={song.title}
+                                                secondary={
+                                                    <Typography variant="body2" color="text.secondary">
+                                                        {song.artist}
+                                                    </Typography>
+                                                }
+                                            />
+                                            <Checkbox
+                                                onClick={(e) => addToQueue(song, e.target.checked)}
+                                                color="primary"
+                                                disableRipple
+                                                disabled={!adminLogin ? queueCount + count >= MAX_QUEUE_LIMIT : false}
+
+                                            />
+
+                                        </ListItem>
+                                        <Divider variant="inset" component="li" />
+                                    </React.Fragment>
+                                ))}
+                            </>
+                        )}
+                    </List>
+                </Box> </>)}
+
+
         </Stack>
     );
 }
