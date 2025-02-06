@@ -35,10 +35,13 @@ function getCookie(name) {
 }
 
 function App() {
+  const logedIn = getCookie('logedIn');
   const adminLogin = document.cookie
     .split('; ')
     .find(cookie => cookie.startsWith('adminLogin='))
     ?.split('=')[1] === 'true';
+  const spotifyAppExpires = parseInt(getCookie('spotifyAppExpiresAt'), 10);
+
   const dispatch = useDispatch();
   const open = useSelector((state) => state.dialog.open);
   const [currentSong, setCurrentSong] = useState(null);
@@ -83,8 +86,8 @@ function App() {
         const accessToken = data.access_token;
 
 
-        document.cookie = `spotify_access_token=${accessToken}; path=/; max-age=${expiresAt}; Secure; SameSite=None`;
-        document.cookie = `spotifyAppExpiresAt=${expiresAt}; path=/; max-age=${expiresAt}; Secure; SameSite=None`;
+        document.cookie = `spotify_access_token=${accessToken}; path=/; max-age=${data.expires_in}; Secure; SameSite=None`;
+        document.cookie = `spotifyAppExpiresAt=${expiresAt}; path=/; max-age=${data.expires_in}; Secure; SameSite=None`;
         // Save to Redux
         dispatch(setToken({ accessToken: accessToken, expiresAt }));
       } else {
@@ -119,7 +122,9 @@ function App() {
     const clientId = process.env.REACT_APP_CLIENT_ID;
     const clientSecret = process.env.REACT_APP_CLIENT_SECRET;
 
-    if (spotifyExpiresAt < Date.now() || (!spotifyAccessToken || spotifyAccessToken === "null")) {
+    if (!refreshToken || refreshToken === "null") return;
+
+    if (Date.now() >= spotifyExpiresAt || (!spotifyAccessToken || spotifyAccessToken === "null")) {
       if (!refreshToken) return;
       try {
         const response = await fetch("https://accounts.spotify.com/api/token", {
@@ -137,9 +142,12 @@ function App() {
         const data = await response.json();
 
         if (data.access_token) {
+          const expiresInMs = Date.now() + data.expires_in * 1000;
           dispatch(setAuth({ userauth: true, UaccessToken: data.access_token }));
+          document.cookie = `LogedIn=true; path=/;max-age=${data.expires_in} Secure; SameSite=None`;
           document.cookie = `spotifyAccessToken=${data.access_token}; path=/; max-age=${data.expires_in};Secure; SameSite=None`;
-          document.cookie = `spotifyExpiresAt=${Date.now() + data.expires_in * 1000}; path=/; max-age=${data.expires_in};Secure; SameSite=None`;
+          document.cookie = `spotifyExpiresAt=${expiresInMs}; max-age=${data.expires_in} path=/; Secure; SameSite=None`;
+
         }
       } catch (error) {
         console.error("Error refreshing access token:", error);
@@ -153,10 +161,15 @@ function App() {
     if (logedIn) {
       dispatch(setAuth({ userauth: true, UaccessToken: spotifyAccessToken }));
     }
-
+    getToken();
     getuserRefereshtoken();
 
-    getToken();
+    // Set an interval to refresh token every 60 minutes (3600 sec)
+    const refreshInterval = setInterval(() => {
+      getuserRefereshtoken();
+    }, 3600 * 1000); // 60 min in milliseconds
+
+    return () => clearInterval(refreshInterval); // Cleanup on unmount
 
   }, []);
 
@@ -187,7 +200,6 @@ function App() {
 
   return (
     <>
-      {/* sx={{ border: '1px dashed grey' }} */}
       <Box component="section" >
         {!adminLogin && (
           <>
@@ -200,7 +212,7 @@ function App() {
                   {showqueue && <MemberQueue />}
                 </Grid>
                 <Grid size={12}>
-                  <ListOFSearchedSong searchResults={searchResults} setQueue={setQueue} />
+                  {logedIn && (<ListOFSearchedSong searchResults={searchResults} setQueue={setQueue} />)}
                 </Grid>
                 <Grid size={12}>
                   <QueuedSongs onSongSelect={setCurrentSong} queuedSong={queuedSong} setQueue={setQueue} />
@@ -212,7 +224,7 @@ function App() {
                   {showqueue && <MemberQueue />}
                 </Grid>
                 <Grid size={queuedSong.length === 0 ? 12 : 6}>
-                  <ListOFSearchedSong searchResults={searchResults} setQueue={setQueue} />
+                  {logedIn && (<ListOFSearchedSong searchResults={searchResults} setQueue={setQueue} />)}
                 </Grid>
                 <Grid size={6}>
                   <QueuedSongs onSongSelect={setCurrentSong} queuedSong={queuedSong} setQueue={setQueue} />
@@ -222,20 +234,39 @@ function App() {
           </>)}
 
         {adminLogin && (
-          <Grid container spacing={2}>
+          <>
             <Grid size={12}>
               <Navbar setSearchResults={setSearchResults} setShowQueue={setShowQueue} />
             </Grid>
-            <Grid size={12}>
-              {showqueue && <AdminQueue />}
-            </Grid>
-            <Grid size={queuedSong.length === 0 ? 12 : 6}>
-              <ListOFSearchedSong searchResults={searchResults} setQueue={setQueue} />
-            </Grid>
-            <Grid size={6}>
-              <QueuedSongs onSongSelect={setCurrentSong} queuedSong={queuedSong} setQueue={setQueue} />
-            </Grid>
-          </Grid>)}
+            {windowSize.width < 650 ? (
+              <Stack spacing={2}>
+                <Grid size={12}>
+                  {showqueue && <AdminQueue />}
+                </Grid>
+                <Grid size={12}>
+                  <ListOFSearchedSong searchResults={searchResults} setQueue={setQueue} adminLogin={adminLogin} />
+                </Grid>
+                <Grid size={12}>
+                  <QueuedSongs onSongSelect={setCurrentSong} queuedSong={queuedSong} setQueue={setQueue} />
+                </Grid>
+              </Stack>
+            ) : (
+              <Grid container spacing={1}>
+                <Grid size={12}>
+                  {showqueue && <AdminQueue />}
+                </Grid>
+                <Grid size={queuedSong.length === 0 ? 12 : 6}>
+                  <ListOFSearchedSong searchResults={searchResults} setQueue={setQueue} adminLogin={adminLogin} />
+                </Grid>
+                <Grid size={6}>
+                  <QueuedSongs onSongSelect={setCurrentSong} queuedSong={queuedSong} setQueue={setQueue} adminLogin={adminLogin} />
+                </Grid>
+              </Grid>
+            )}
+
+
+
+          </>)}
 
       </Box>
     </>
