@@ -7,7 +7,7 @@ import {
     Button
 } from "@mui/material";
 
-const socket = io("https://streamusic-backend.onrender.com");
+const socket = io(`${process.env.REACT_APP_BackEnd}`);
 
 export default function MemberQueue() {
     const [queue, setQueue] = useState([]);
@@ -19,20 +19,20 @@ export default function MemberQueue() {
         .find(cookie => cookie.startsWith('adminLogin='))
         ?.split('=')[1] === 'true';
 
-    const fetchQueue = async () => {
-        try {
-            const response = await fetch("https://streamusic-backend.onrender.com/queue");
-            const data = await response.json();
-            setQueue(data.queue);
-        } catch (error) {
-            console.error("Error fetching queue:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    // const fetchQueue = async () => {
+    //     try {
+    //         const response = await fetch(`${process.env.REACT_APP_BackEnd/queue}`);
+    //         const data = await response.json();
+    //         setQueue(data.queue);
+    //     } catch (error) {
+    //         console.error("Error fetching queue:", error);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
     useEffect(() => {
-        fetchQueue();
+        // fetchQueue();
         socket.on("queueUpdated", (updatedQueue) => {
             setQueue(updatedQueue);
         });

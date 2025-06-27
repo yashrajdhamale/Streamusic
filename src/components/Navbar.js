@@ -1,18 +1,30 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { styled, alpha } from "@mui/material/styles";
-import { AppBar, Box, Toolbar, Typography, InputBase, Button } from "@mui/material";
+import {
+  AppBar,
+  Box,
+  Toolbar,
+  Typography,
+  InputBase,
+  Button,
+} from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import LoginDialog from "./LoginDialog";
-import { AuthenticationContext, SessionContext } from '@toolpad/core/AppProvider';
-import { Account } from '@toolpad/core/Account';
 import { useDispatch, useSelector } from "react-redux";
 import { setAuth } from "../store/authSlice";
 import { useNavigate } from "react-router-dom";
-import { setQuery } from '../store/searchQuerySlice.js';
+import { setQuery } from "../store/searchQuerySlice.js";
 import { setLoading } from "../store/loadingSlice.js";
-import QueueMusicIcon from '@mui/icons-material/QueueMusic';
+import QueueMusicIcon from "@mui/icons-material/QueueMusic";
 import { setOpen } from "../store/dialogSlice.js";
-import { Password } from "@mui/icons-material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import IconButton from "@mui/material/IconButton";
+import AccountCircle from "@mui/icons-material/AccountCircle";
+import MenuItem from "@mui/material/MenuItem";
+import Menu from "@mui/material/Menu";
+
+
+
+
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: theme.shape.borderRadius,
@@ -50,7 +62,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-
 function Navbar({ setSearchResults, setShowQueue }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -60,7 +71,6 @@ function Navbar({ setSearchResults, setShowQueue }) {
   const open = useSelector((state) => state.dialog.open);
   const [data, setdata] = useState(null);
   const [session, setSession] = React.useState(null);
-
 
   const fetchUserData = async (UaccessToken) => {
     try {
@@ -86,55 +96,48 @@ function Navbar({ setSearchResults, setShowQueue }) {
     }
   };
 
-  const logedIn = document.cookie
-    .split('; ')
-    .find(cookie => cookie.startsWith('logedIn='))
-    ?.split('=')[1] === 'true';
-  const adminLogin = document.cookie
-    .split('; ')
-    .find(cookie => cookie.startsWith('adminLogin='))
-    ?.split('=')[1] === 'true';
-  const authentication = React.useMemo(() => {
-    return {
-      signIn: () => {
-        dispatch(setOpen(true));
-        if (data) {
-          setSession({ user: data });
+  const logedIn =
+    document.cookie
+      .split("; ")
+      .find((cookie) => cookie.startsWith("logedIn="))
+      ?.split("=")[1] === "true";
+  const adminLogin =
+    document.cookie
+      .split("; ")
+      .find((cookie) => cookie.startsWith("adminLogin="))
+      ?.split("=")[1] === "true";
+  // const authentication = React.useMemo(() => {
+  //   return {
+  //     signIn: () => {
+  //       dispatch(setOpen(true));
+  //       if (data) {
+  //         setSession({ user: data });
+  //       } else if (adminLogin) {
+  //         setSession({ user: { name: "Admin", email: "thepack@gmail.com" } });
+  //       }
+  //     },
+  //     signOut: () => {
+  //       setSession(null);
+  //       document.cookie = "logedIn=; path=/;  Secure;max-age=0; SameSite=None";
+  //       document.cookie =
+  //         "spotifyAccessToken=; path=/; max-age=0; Secure; SameSite=None";
+  //       document.cookie =
+  //         "spotifyExpiresAt=; path=/; max-age=0;Secure; SameSite=None";
+  //       document.cookie =
+  //         "spotifyRefreshToken=; path=/; max-age=0; Secure; SameSite=None";
+  //       document.cookie =
+  //         "adminLogin=; path=/; Secure;max-age=0; SameSite=None";
 
-        }
-        else if (adminLogin) {
-          setSession({ user: { name: "Admin", email: "thepack@gmail.com" } });
-        }
-      },
-      signOut: () => {
-        setSession(null);
-        document.cookie = "logedIn=; path=/;  Secure;max-age=0; SameSite=None";
-        document.cookie = "spotifyAccessToken=; path=/; max-age=0; Secure; SameSite=None";
-        document.cookie = "spotifyExpiresAt=; path=/; max-age=0;Secure; SameSite=None";
-        document.cookie = "spotifyRefreshToken=; path=/; max-age=0; Secure; SameSite=None";
-        document.cookie = "adminLogin=; path=/; Secure;max-age=0; SameSite=None";
-
-        dispatch(setAuth({ userauth: false }));
-        dispatch(setOpen(true));
-
-      },
-    };
-  }, []);
+  //       dispatch(setAuth({ userauth: false }));
+  //       dispatch(setOpen(true));
+  //     },
+  //   };
+  // }, []);
 
   const showQueue = () => {
-    setShowQueue(prevState => !prevState);
-  }
+    setShowQueue((prevState) => !prevState);
+  };
 
-
-  const handleClose = () => {
-    if (logedIn) {
-      dispatch(setOpen(false));
-
-    }
-    navigate('/Streamusic');
-
-
-  }
   useEffect(() => {
     if (UaccessToken) {
       fetchUserData(UaccessToken).then((userData) => {
@@ -155,8 +158,8 @@ function Navbar({ setSearchResults, setShowQueue }) {
   // Debounced search function
   useEffect(() => {
     if (!accessToken || !searchQuery) {
-      return
-    };
+      return;
+    }
 
     const timer = setTimeout(async () => {
       try {
@@ -167,7 +170,14 @@ function Navbar({ setSearchResults, setShowQueue }) {
         );
         const data = await response.json();
         if (data.tracks) {
-          setSearchResults(data.tracks.items);
+          const searchData = data.tracks.items.map((item) => ({
+            id: item.id,
+            title: item.name,
+            thumbnail: item.album.images[0].url,
+            duration: item.duration_ms,
+            artists: item.artists,
+          }));
+          setSearchResults(searchData);
           dispatch(setLoading(false));
         }
       } catch (error) {
@@ -177,28 +187,51 @@ function Navbar({ setSearchResults, setShowQueue }) {
 
     return () => clearTimeout(timer); // Cleanup function
   }, [searchQuery, accessToken, setSearchResults]);
+  const theme = createTheme({
+    palette: {
+      secondary: {
+        main: "#626eb2",
+        light: "#F5EBFF",
+        // dark: will be calculated from palette.secondary.main,
+        contrastText: "White",
+      },
+    },
+  });
+  const [auth, setAuth] = React.useState(true);
+  const [anchorEl, setAnchorEl] = React.useState(null);
 
+  const handleChange = (event) => {
+    setAuth(event.target.checked);
+  };
+
+  const handleMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   return (
+    <ThemeProvider theme={theme}>
+      <AppBar position="static" color="secondary" padding="20px" width="auto">
+        <Toolbar sx={{ justifyContent: "space-between" }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 300,
+                fontSize: { xs: 13, sm: 14, md: 18 },
+                whiteSpace: "nowrap",
+                overflow: "visible",
+                textOverflow: "clip",
+                minWidth: "100px",
+              }}
+            >
+              Streamusic
+            </Typography>{" "}
+          </Box>
 
-    <AppBar position="static">
-      <Toolbar sx={{ justifyContent: "space-between" }}>
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: 100,
-            fontSize: { xs: 13, sm: 14, md: 18 },
-            whiteSpace: "nowrap",
-            overflow: "visible",
-            textOverflow: "clip",
-            minWidth: "120px",
-          }}
-        >
-          PACK PLAYER
-        </Typography>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0 }}>
-          <Button variant="text" color="white" onClick={showQueue} sx={{ padding: 1 }}>
-            <QueueMusicIcon sx={{ margin: "auto" }} />
-          </Button>
           <Search>
             <SearchIconWrapper>
               <SearchIcon />
@@ -209,20 +242,49 @@ function Navbar({ setSearchResults, setShowQueue }) {
               inputProps={{ "aria-label": "search" }}
             />
           </Search>
-
-          <Typography variant="h6" sx={{ fontWeight: 100, fontSize: 15, padding: 1 }}><AuthenticationContext.Provider value={authentication} >
-            <SessionContext.Provider value={session}>
-              {/* preview-start */}
-              <Account />
-              {/* preview-end */}
-            </SessionContext.Provider>
-          </AuthenticationContext.Provider>
-          </Typography>
-          {!logedIn && <LoginDialog open={open} handleClose={handleClose} />}
-        </Box>
-      </Toolbar>
-    </AppBar>
-
+          {auth && (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0 }}>
+              <Button
+                variant="text"
+                color="white"
+                onClick={showQueue}
+                sx={{ padding: 1, minWidth: "auto" }}
+              >
+                <QueueMusicIcon sx={{ margin: "auto" }} />
+              </Button>
+              <IconButton
+                size="large"
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleMenu}
+                color="inherit"
+              >
+                <AccountCircle />
+              </IconButton>
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorEl}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+              >
+                <MenuItem onClick={handleClose}>Profile</MenuItem>
+                <MenuItem onClick={handleClose}>My account</MenuItem>
+              </Menu>
+            </Box>
+          )}
+        </Toolbar>
+      </AppBar>
+    </ThemeProvider>
   );
 }
 
