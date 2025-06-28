@@ -5,7 +5,8 @@ import axios from "axios";
 const HomeCarousel = () => {
   const fetchSongPoster = async () => {
     const res = await axios.get(
-      `${process.env.REACT_APP_BackEnd}/app/getTrendingSongsPoster`
+      // `${process.env.REACT_APP_BackEnd}/app/getTrendingSongsPoster`
+      `https://streamusic-backend.onrender.com/app/getTrendingSongsPoster`
     );
     return res.data;
   };
