@@ -66,7 +66,7 @@ const Home = () => {
                 textAlign: "center",
               }}
             >
-              {/* <HomeCarousel /> */}
+              <HomeCarousel />
               <Stack
                 spacing={3}
                 sx={{
