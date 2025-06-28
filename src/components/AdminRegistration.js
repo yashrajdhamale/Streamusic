@@ -22,6 +22,7 @@ const AdminRegisterWithOtp = () => {
 
   const Register = async () => {
     try {
+      setError("");
       const response = await axios.post(
         `${process.env.REACT_APP_BackEnd}/admin/registration`,
         {
@@ -32,15 +33,27 @@ const AdminRegisterWithOtp = () => {
       );
 
       if (response.status === 201 || response.status === 200) {
-        // success logic
-        alert("Registration successful!");
-        // optionally navigate or update UI state here
-      } else if (response.status === 400) {
-        // alert(response.error);
+        setError("Registration successful!");
       }
     } catch (error) {
-      console.error("Registration failed:", error);
-      setError("Registration failed. Please try again.");
+      if (error.response) {
+        const status = error.response.status; // e.g., 400 or 500
+        const data = error.response.data; // e.g., { error: "Admin already registered" }
+
+        if (status === 400) {
+          setError(data.error); // Show the message from your backend
+        } else if (status === 500) {
+          setError(data.error); // "Error Registering Admin"
+        } else {
+          setError("Something unexpected happened.");
+        }
+      } else if (error.request) {
+        // No response received from the server (e.g., network error)
+        setError("No response from the server. Check your internet.");
+      } else {
+        // Something else went wrong in setting up the request
+        setError("Request setup error.");
+      }
     }
   };
 
@@ -66,7 +79,6 @@ const AdminRegisterWithOtp = () => {
 
   const verifyOtp = async () => {
     setSnackbarKey((prev) => prev + 1); // change key to force reopen
-    console.log(snackbarKey);
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_BackEnd}/admin/registration/verify-otp`,
@@ -125,6 +137,25 @@ const AdminRegisterWithOtp = () => {
         >
           Verify Email
         </Button>
+        <Box open={open} onClose={() => setOpen(false)}>
+          <Typography variant="h7" mb={2} >
+            {`Enter OTP sent to your ${form.email}`}
+          </Typography>
+          <TextField
+            fullWidth
+            label="OTP"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+          />
+          <Button
+            variant="contained"
+            fullWidth
+            sx={{ mt: 2 }}
+            onClick={verifyOtp}
+          >
+            Verify OTP
+          </Button>
+        </Box>
 
         <TextField
           label="Password"
@@ -148,38 +179,6 @@ const AdminRegisterWithOtp = () => {
         </Button>
       </Box>
 
-      {/* OTP Modal */}
-      <Modal open={open} onClose={() => setOpen(false)}>
-        <Box
-          p={4}
-          bgcolor="white"
-          borderRadius={2}
-          boxShadow={4}
-          sx={{
-            maxWidth: 400,
-            mx: "auto",
-            mt: "20vh",
-          }}
-        >
-          <Typography variant="h6" mb={2}>
-            Enter OTP sent to your email
-          </Typography>
-          <TextField
-            fullWidth
-            label="OTP"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-          />
-          <Button
-            variant="contained"
-            fullWidth
-            sx={{ mt: 2 }}
-            onClick={verifyOtp}
-          >
-            Verify OTP
-          </Button>
-        </Box>
-      </Modal>
     </Container>
   );
 };
