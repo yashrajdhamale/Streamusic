@@ -47,19 +47,18 @@ const Home = () => {
             <Box
               component="section"
               sx={{
-                minHeight: "100vh",
+                minHeight: "65vh",
+                width: "100%",
                 display: "flex",
                 alignItems: "top",
                 justifyContent: "center",
                 textAlign: "center",
-                p: 5,
               }}
               backgroundColor="#d1d1f7"
             >
               <Stack
                 spacing={2}
                 sx={{
-                  maxWidth: 1200,
                   top: 0,
                   display: "flex",
                   alignItems: "center",
