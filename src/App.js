@@ -7,7 +7,8 @@ import { debounce } from "lodash";
 import { setAuth, setToken } from "./store/authSlice";
 import { setWindow } from "./store/changewindowSlice";
 import { Route, Routes } from "react-router-dom";
-
+import Nav from "./components/Navbar";
+import Footer from "./components/Footer";
 import AdminQueue from "./components/AdminQueue";
 import Navbar from "./components/Navbar";
 import QueuedSongs from "./components/QueuedSongs";
@@ -17,7 +18,9 @@ import AdminRegistration from "./components/AdminRegistration";
 import AdminLogin from "./components/AdminLogin";
 import UserLogin from "./components/UserLogin";
 import Home from "./components/Home";
-import HomeCarousel from "./components/HomeCarousel";
+import { styled } from "@mui/material/styles";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { amber } from "@mui/material/colors";
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -175,10 +178,21 @@ function App() {
       window.removeEventListener("resize", handleResize);
     };
   }, [handleResize, queuedSong]);
-
-  return (
-    // <h1 style={{ border: "dark", textAlign: "center" }}>Hey there</h1>
-    <Box sx={{ width: "100%" }}>
+ const theme = createTheme({
+    palette: {
+      
+      secondary: {
+        main: "#E0C2FF",
+        light: "#e7ecf1",
+        white: "white",
+        // dark: will be calculated from palette.secondary.main,
+        // contrastText: "#47008F",
+      },
+    },
+  });
+  return ( <ThemeProvider theme={theme}>
+    <Box sx={{ width: "100%" }} backgroundColor="secondary.light" >
+      <Nav />
       <Routes>
         <Route
           path="Streamusic/admin-registration"
@@ -187,7 +201,7 @@ function App() {
 
         <Route path="Streamusic/admin-login" element={<AdminLogin />} />
         <Route path="Streamusic/user-login" element={<UserLogin />} />
-        
+
         <Route path="/Streamusic" element={<Home />} />
         <Route
           path="Streamusic/dashboard"
@@ -261,7 +275,8 @@ function App() {
           }
         />
       </Routes>
-    </Box>
+      <Footer />
+    </Box></ThemeProvider>
   );
 }
 

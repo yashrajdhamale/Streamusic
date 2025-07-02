@@ -1,4 +1,4 @@
-import { Box, Typography, Divider,Link } from "@mui/material";
+import { Box, Typography, Divider, Link } from "@mui/material";
 // import { Link } from "react-router-dom";
 import Grid from "@mui/material/Grid2";
 const Footer = () => {
@@ -6,7 +6,7 @@ const Footer = () => {
     <Box
       component="footer"
       sx={{
-        bgcolor: "#E9DB5D",
+        bgcolor: "#c7c6f9",
         color: "black",
         py: 4,
         px: { xs: 2, sm: 4, md: 10 },
@@ -101,7 +101,11 @@ const Footer = () => {
 
       <Divider sx={{ bgcolor: "#444", my: 3 }} />
 
-      <Typography variant="body2" align="center" color="gray">
+      <Typography
+        variant="body2"
+        align="center"
+        color="gray"
+      >
         © {new Date().getFullYear()} Streamusic. All rights reserved.
       </Typography>
     </Box>

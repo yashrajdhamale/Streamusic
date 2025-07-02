@@ -22,13 +22,14 @@ const HomeCarousel = () => {
   return (
     <div
       style={{
-        position: "absolute",
+        // position: "absolute",
         top: 0,
         left: 0,
         width: "100%",
         height: "100%",
-        zIndex: 0,
+        // zIndex: 0,
         overflow: "hidden",
+        borderRadius: "30px",
       }}
     >
       <Carousel
@@ -37,9 +38,10 @@ const HomeCarousel = () => {
         interval={2000}
         pause={false}
         style={{ height: "100%" }}
+        sx={{ m: 3,p: 2}}
       >
         {data.map((value) => (
-          <Carousel.Item key={value.id} style={{ height: "100%" }}>
+          <Carousel.Item key={value.id} style={{ height: "100%" , width: "100%"}}>
             <img
               src={value.thumbnailUrl}
               alt="Trending Poster"
@@ -47,7 +49,6 @@ const HomeCarousel = () => {
                 width: "100%",
                 height: "100%",
                 objectFit: "cover",
-                filter: "brightness(30%)",
               }}
             />
           </Carousel.Item>
@@ -56,6 +57,5 @@ const HomeCarousel = () => {
     </div>
   );
 };
-
 
 export default HomeCarousel;

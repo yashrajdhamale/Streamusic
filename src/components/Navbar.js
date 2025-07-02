@@ -190,10 +190,10 @@ function Navbar({ setSearchResults, setShowQueue }) {
   const theme = createTheme({
     palette: {
       secondary: {
-        main: "#626eb2",
+        main: "#fff",
         light: "#F5EBFF",
         // dark: will be calculated from palette.secondary.main,
-        contrastText: "White",
+        contrastText: "Black",
       },
     },
   });
@@ -213,7 +213,7 @@ function Navbar({ setSearchResults, setShowQueue }) {
   };
   return (
     <ThemeProvider theme={theme}>
-      <AppBar position="static" color="secondary" padding="20px" width="auto">
+      <AppBar position="fixed" color="secondary" padding="20px" width="auto" elevation={0}  >
         <Toolbar sx={{ justifyContent: "space-between" }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           
@@ -232,7 +232,7 @@ function Navbar({ setSearchResults, setShowQueue }) {
             </Typography>{" "}
           </Box>
 
-          <Search>
+          <Search >
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
@@ -240,6 +240,7 @@ function Navbar({ setSearchResults, setShowQueue }) {
               onChange={(e) => dispatch(setQuery(e.target.value))}
               placeholder="Search…"
               inputProps={{ "aria-label": "search" }}
+              sx={{border: 1}}
             />
           </Search>
           {auth && (

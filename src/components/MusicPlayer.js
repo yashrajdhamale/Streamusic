@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import YouTube from "react-youtube";
-import { Box, Card, Typography, Button, Slider, Stack } from "@mui/material";
+import { Box,  Typography, Button, Slider, Stack } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { PlayArrow, Pause } from "@mui/icons-material";
 import { debounce } from 'lodash';

@@ -4,13 +4,15 @@ import {
   TextField,
   Button,
   Box,
-  Modal,
   Typography,
   Alert,
   Container,
 } from "@mui/material";
-import AdminRegistrationSnackBar from "./AdminRegistrationSnackBar";
-
+import Stack from "@mui/material/Stack";
+import Paper from "@mui/material/Paper";
+import { styled } from "@mui/material/styles";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { amber } from "@mui/material/colors";
 const AdminRegisterWithOtp = () => {
   const [form, setForm] = useState({ email: "", fullName: "", password: "" });
   const [otp, setOtp] = useState("");
@@ -19,6 +21,13 @@ const AdminRegisterWithOtp = () => {
   const [open, setOpen] = useState(false);
 
   const [snackbarKey, setSnackbarKey] = React.useState(0);
+  const DemoPaper = styled(Paper)(({ theme }) => ({
+    width: 120,
+    height: 120,
+    padding: theme.spacing(2),
+    ...theme.typography.body2,
+    textAlign: "center",
+  }));
 
   const Register = async () => {
     try {
@@ -96,90 +105,115 @@ const AdminRegisterWithOtp = () => {
       setError("Incorrect OTP. Try again.");
     }
   };
-
+  const theme = createTheme({
+    palette: {
+      amber: {
+        main: amber[800], // or another shade like amber[700]
+        contrastText: "#fff", // optional
+      },
+      secondary: {
+        main: "#E0C2FF",
+        light: "#82b1ff",
+        white: "white",
+        // dark: will be calculated from palette.secondary.main,
+        contrastText: "#47008F",
+      },
+    },
+  });
   return (
-    <Container maxWidth="sm">
-      <Box sx={{ m: 2, p: 3 }}>
-        {error && (
-          <AdminRegistrationSnackBar
-            message={error}
-            snackbarKey={snackbarKey}
-          />
-        )}
-      </Box>
-      <Box p={4} mt={5} boxShadow={3} borderRadius={2}>
-        <Typography variant="h5" mb={2}>
-          Admin Registration
-        </Typography>
-
-        <TextField
-          label="Full Name"
-          fullWidth
-          name="fullName"
-          margin="normal"
-          value={form.fullName}
-          onChange={handleChange}
-        />
-        <TextField
-          label="Email"
-          fullWidth
-          name="email"
-          margin="normal"
-          value={form.email}
-          onChange={handleChange}
-        />
-        <Button
-          variant="outlined"
-          color="primary"
-          onClick={sendOtp}
-          sx={{ mt: 1, mb: 2 }}
-          disabled={form.fullName === "" || form.email === ""}
-        >
-          Verify Email
-        </Button>
-        <Box open={open} onClose={() => setOpen(false)}>
-          <Typography variant="h7" mb={2} >
-            {`Enter OTP sent to your ${form.email}`}
+    <ThemeProvider theme={theme}>
+      <Container backgroundColor="secondary.light" color="secondary.white">
+        <Box p={4} mt={3} mb={3} color="secondary.white">
+          {error && (
+            <Box sx={{ mb: 3 }}>
+              <Alert severity="info" snackbarKey={snackbarKey}>
+                {error}
+              </Alert>
+            </Box>
+          )}
+          <Typography variant="h5" mb={2}>
+            Admin Registration
           </Typography>
+
           <TextField
+            label="Full Name"
             fullWidth
-            label="OTP"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
+            name="fullName"
+            margin="normal"
+            value={form.fullName}
+            onChange={handleChange}
+          />
+          <TextField
+            label="Email"
+            fullWidth
+            name="email"
+            margin="normal"
+            value={form.email}
+            onChange={handleChange}
           />
           <Button
-            variant="contained"
-            fullWidth
-            sx={{ mt: 2 }}
-            onClick={verifyOtp}
+            variant="outlined"
+            color="primary"
+            onClick={sendOtp}
+            sx={{ mt: 1, mb: 2 }}
+            disabled={form.fullName === "" || form.email === ""}
           >
-            Verify OTP
+            Verify Email
+          </Button>
+          {open && (
+            <Box>
+              <Alert severity="success" sx={{ mb: 3 }}>
+                {open && form.email && `Enter OTP sent to your ${form.email}`}
+              </Alert>
+
+              <Box onClose={() => setOpen(false)} display="flex">
+                <TextField
+                  fullWidth
+                  label="OTP"
+                  value={otp}
+                  sx={{ width: "250px", mr: 4 }}
+                  onChange={(e) => setOtp(e.target.value)}
+                />
+                <Button
+                  variant="contained"
+                  onClick={verifyOtp}
+                  width="200px"
+                  height="150px"
+                >
+                  Verify OTP
+                </Button>
+              </Box>
+            </Box>
+          )}
+
+          <TextField
+            label="Password"
+            fullWidth
+            name="password"
+            type="password"
+            margin="normal"
+            value={form.password}
+            onChange={handleChange}
+          />
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            sx={{ mt: 2 }}
+            disabled={step !== 2}
+            onClick={Register}
+          >
+            Register
           </Button>
         </Box>
 
-        <TextField
-          label="Password"
-          fullWidth
-          name="password"
-          type="password"
-          margin="normal"
-          value={form.password}
-          onChange={handleChange}
-        />
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          color="primary"
-          sx={{ mt: 2 }}
-          disabled={step !== 2}
-          onClick={Register}
-        >
-          Register
-        </Button>
-      </Box>
-
-    </Container>
+        <Stack direction="row" spacing={2}>
+          <DemoPaper square={false}>rounded corners</DemoPaper>
+          <DemoPaper square>square corners</DemoPaper>
+        </Stack>
+      </Container>
+    </ThemeProvider>
   );
 };
 
