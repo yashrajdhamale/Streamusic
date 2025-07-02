@@ -1,32 +1,27 @@
-import Nav from "./Navbar";
 // import React from "react";
-import { Link, useNavigate } from "react-router-dom";
-import * as React from "react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+
+// MUI Core
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
-import { styled } from "@mui/material/styles";
-import Typography from "@mui/joy/Typography";
 import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
 import { amber } from "@mui/material/colors";
-import Divider, { dividerClasses } from "@mui/material/Divider";
+
+// MUI Theme
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
+
+// Custom Component
 import HomeCard from "./HomeAccordian";
-import Footer from "./Footer";
 import HomeCarousel from "./HomeCarousel";
+// If you're using Typography from @mui/joy (optional)
+import Typography from "@mui/material/Typography";
 
 const Home = () => {
   const Navigate = useNavigate();
-  const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: "#fff",
-    ...theme.typography.body2,
-    padding: theme.spacing(1),
-    textAlign: "center",
-    color: (theme.vars ?? theme).palette.text.secondary,
-    ...theme.applyStyles("dark", {
-      backgroundColor: "#1A2027",
-    }),
-  }));
 
   const theme = createTheme({
     palette: {
@@ -46,72 +41,67 @@ const Home = () => {
 
   return (
     <>
-      <Nav />
       <ThemeProvider theme={theme}>
-        <Box
-          sx={{ width: "100%" }}
-          backgroundColor="secondary.light"
-          color="secondary.white"
-        >
-          <Stack spacing={2} width="100%">
+        <Box sx={{ width: "100%", mt: "55px" }}>
+          <Stack spacing={0} width="100%">
             <Box
               component="section"
-              position="relative"
-              zIndex="1"
               sx={{
                 minHeight: "100vh",
                 display: "flex",
-                alignItems: "center",
+                alignItems: "top",
                 justifyContent: "center",
                 textAlign: "center",
+                p: 5,
               }}
+              backgroundColor="#d1d1f7"
             >
-              <HomeCarousel />
               <Stack
-                spacing={3}
+                spacing={2}
                 sx={{
-                  maxWidth: 900,
+                  maxWidth: 1200,
+                  top: 0,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   textAlign: "center",
-                  zIndex: 1,
+                  p: 2,
                 }}
               >
                 <Typography
-                  level="h1"
+                  level="h6"
                   sx={{
-                    fontSize: { xs: "2rem", sm: "3rem", md: "4rem" },
+                    fontSize: { xs: "1.5rem", sm: "3rem", md: "4rem" },
                     fontWeight: "bold",
                   }}
+                  color="#2b1c50"
                 >
-                  Welcome to Streamusic
+                  Your ultimate space for music discovery and streaming
                 </Typography>
 
                 <Typography
                   level="h4"
                   sx={{
-                    fontSize: { xs: "1.2rem", sm: "1.5rem", md: "1.8rem" },
-                    color: "white",
+                    fontSize: { xs: "1rem", sm: "1.5rem", md: "1.8rem" },
                   }}
+                  color="#3d2e7c"
                 >
-                  Let the Crowd Choose the Beat 🎵
+                  Let the Crowd Choose the Beat
                 </Typography>
 
-                <Box theme={theme} sx={{ display: "flex", gap: 2 }}>
+                <Box sx={{ display: "flex", gap: 2 }}>
                   <Button
                     variant="solid"
                     color="primary"
                     size="small"
                     sx={{
-                      mt: 2,
+                      mt: 1,
                       borderRadius: "30px",
                       px: 4,
                       fontWeight: "bold",
-                      backgroundColor: "#fff",
-                      color: "#0288d1",
+                      backgroundColor: "#4b42ae",
+                      color: "#fff",
                       "&:hover": {
-                        // backgroundColor: "#03a9f4",
                         transform: "scale(1.05)",
                       },
                       transition: "all 0.3s ease",
@@ -129,29 +119,41 @@ const Home = () => {
                     color="primary"
                     size="small"
                     sx={{
-                      mt: 2,
+                      mt: 1,
                       borderRadius: "30px",
                       px: 4,
                       fontWeight: "bold",
                       backgroundColor: "#fff",
-                      color: "#0288d1",
+                      color: "#565add",
                       "&:hover": {
-                        // backgroundColor: "#03a9f4",
                         transform: "scale(1.05)",
                       },
                       transition: "all 0.3s ease",
                       boxShadow: "lg",
                       maxWidth: "200px",
                     }}
-                     onClick={() => {
+                    onClick={() => {
                       Navigate("/Streamusic/user-login");
                     }}
                   >
                     Connect & Join Room
                   </Button>
                 </Box>
+                <Box
+                  component="section"
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    textAlign: "center",
+                  }}
+                  backgroundColor="#d1d1f7"
+                >
+                  <HomeCarousel />
+                </Box>
               </Stack>
             </Box>
+
             <Divider orientation="horizontal" flexItem />
             <Box
               component="section"
@@ -240,15 +242,8 @@ const Home = () => {
           </Stack>
         </Box>
       </ThemeProvider>
-      <Footer />
     </>
   );
 };
-const FeatureCard = ({ title, desc }) => (
-  <div className="bg-gray-900 rounded-xl p-6 shadow-md hover:shadow-lg transition duration-300">
-    <h3 className="text-xl font-bold mb-2">{title}</h3>
-    <p>{desc}</p>
-  </div>
-);
 
 export default Home;

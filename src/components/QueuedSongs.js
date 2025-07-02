@@ -1,16 +1,11 @@
-import React, { useEffect } from "react";
-import SongItem from "./SongItem";
-import { styled } from "@mui/material/styles";
+import React from "react";
 import {
   Button,
   Typography,
-  Card,
-  CardContent,
-  CardMedia,
+ 
   List,
   ListItem,
   Stack,
-  Grid2,
   Box,
   Skeleton,
   Avatar,
@@ -20,7 +15,6 @@ import {
 } from "@mui/material";
 import QueueMusicIcon from "@mui/icons-material/QueueMusic";
 import { useSelector, useDispatch } from "react-redux";
-import { get } from "lodash";
 import { setUserQueueCount } from "../store/usercountSlice.js";
 
 function QueuedSongs({ onSongSelect, queuedSong, setQueue, adminLogin }) {
