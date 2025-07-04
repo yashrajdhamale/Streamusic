@@ -74,32 +74,9 @@ const Footer = () => {
           <Typography variant="body2">Phone: +91 7262924896</Typography>
         </Grid>
 
-        {/* Social Media */}
-        <Grid item size={{ xs: 12, sm: 6, md: 3 }}>
-          <Grid>
-            <Typography variant="h6" gutterBottom>
-              Follow Us
-            </Typography>
-          </Grid>
-          <Grid>
-            <Link href="#" color="inherit" underline="hover" display="block">
-              Instagram
-            </Link>
-          </Grid>
-          <Grid>
-            <Link href="#" color="inherit" underline="hover" display="block">
-              Twitter
-            </Link>
-          </Grid>
-          <Grid>
-            <Link href="#" color="inherit" underline="hover" display="block">
-              LinkedIn
-            </Link>
-          </Grid>
-        </Grid>
       </Grid>
 
-      <Divider sx={{ bgcolor: "#444", my: 3 }} />
+      <Divider sx={{ bgcolor: "#444", my: 8 }} />
 
       <Typography
         variant="body2"

@@ -21,8 +21,7 @@ import IconButton from "@mui/material/IconButton";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
-
-
+import favicon from '../utils/favicon.ico';
 
 
 const Search = styled("div")(({ theme }) => ({
@@ -216,7 +215,13 @@ function Navbar({ setSearchResults, setShowQueue }) {
       <AppBar position="fixed" color="secondary" padding="20px" width="auto" elevation={0}  >
         <Toolbar sx={{ justifyContent: "space-between" }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          
+          <IconButton edge="start" color="inherit" aria-label="logo">
+          <img 
+            src={favicon} // replace with your image path
+            alt="Logo"
+            style={{ width: 40, height: 40, borderRadius: '50%' }} // customize as needed
+          />
+        </IconButton>
             <Typography
               variant="h5"
               sx={{
@@ -232,7 +237,7 @@ function Navbar({ setSearchResults, setShowQueue }) {
             </Typography>{" "}
           </Box>
 
-          <Search >
+          {/* <Search >
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
@@ -242,8 +247,8 @@ function Navbar({ setSearchResults, setShowQueue }) {
               inputProps={{ "aria-label": "search" }}
               sx={{border: 1}}
             />
-          </Search>
-          {auth && (
+          </Search> */}
+          {/* {auth && (
             <Box sx={{ display: "flex", alignItems: "center", gap: 0 }}>
               <Button
                 variant="text"
@@ -282,7 +287,7 @@ function Navbar({ setSearchResults, setShowQueue }) {
                 <MenuItem onClick={handleClose}>My account</MenuItem>
               </Menu>
             </Box>
-          )}
+          )} */}
         </Toolbar>
       </AppBar>
     </ThemeProvider>

@@ -43,7 +43,7 @@ const Home = () => {
     <>
       <ThemeProvider theme={theme}>
         <Box sx={{ width: "100%", mt: "55px" }}>
-          <Stack spacing={0} width="100%">
+          <Stack spacing={2} width="100%">
             <Box
               component="section"
               sx={{
@@ -53,6 +53,7 @@ const Home = () => {
                 alignItems: "top",
                 justifyContent: "center",
                 textAlign: "center",
+                pb: 10
               }}
               backgroundColor="#d1d1f7"
             >
@@ -154,6 +155,67 @@ const Home = () => {
             </Box>
 
             <Divider orientation="horizontal" flexItem />
+            <Box
+              component="section"
+              sx={{
+                p: 4,
+                height: "660px",
+                display: "flex",
+                alignContent: "center",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Box
+                sx={{
+                  background: "#2b1c50",
+                  width: "100%",
+                  borderRadius: "8%",
+                  height: "100%",
+                  color: "white",
+                  display: "flex",
+                  alignContent: "center",
+                  alignItems: "center",
+                  justifyContent: "center",
+                   
+                }}
+              >
+                <Typography
+                  level="h2"
+                  sx={{
+                    fontSize: { xs: 30, sm: 40, md: 50 },
+                    "margin-top": 30,
+                    textAlign: "left",
+                    p: 2,
+                  }}
+                >
+                  Try for free
+                </Typography>
+                {/* <Typography
+                  level="h6"
+                  sx={{
+                    fontSize: { xs: 10, sm: 10, md: 20 },
+                    textAlign: "left",
+                    width: "100%",
+                    pl: 2,
+                    mt: 2,
+                    mb: 5,
+                  }}
+                >
+                  Revolutionize group music experiences with smart,
+                  collaborative playlists!
+                </Typography> */}
+                <Typography
+                  level="h6"
+                  sx={{
+                    fontSize: { xs: 16, sm: 20, md: 40 },
+                    textAlign: "left",
+                  }}
+                >
+                  <img src="" />
+                </Typography>
+              </Box>
+            </Box>
             <Box
               component="section"
               sx={{
