@@ -28,17 +28,7 @@ import Typography from "@mui/material/Typography";
 
 const Home = () => {
   const Navigate = useNavigate();
-  const features = [
-    "Spotify OAuth Integration",
-    "Collaborative Song Queue",
-    "Song Voting System",
-    "Admin Playback Control",
-    "Smart Search via YouTube API",
-    "Responsive Web App",
-    "Secure Session Management",
-    "Live Queue Updates",
-    "Cloud-Ready Architecture",
-  ];
+
   const theme = createTheme({
     palette: {
       amber: {
@@ -65,6 +55,7 @@ const Home = () => {
       backgroundColor: "#1A2027",
     }),
   }));
+
   return (
     <>
       <ThemeProvider theme={theme}>
@@ -282,39 +273,153 @@ const Home = () => {
               </Box>
             </Box>
 
-            {/* <Box
+            <Divider orientation="horizontal" flexItem />
+
+            <Box
               component="section"
               sx={{
                 p: 2,
-                height: { xs: "auto", md: "660px" },
+                height: { xs: "auto", md: "550px" },
+                display: "flex",
+                alignItems: "top",
+                justifyContent: "center",
+                textAlign: "center",
               }}
             >
-              <Typography
-                variant="h4"
-                sx={{
-                  fontSize: { xs: 24, sm: 32, md: 40 },
-                  mt: 4,
-                  mb: 3,
-                  textAlign: "left",
-                }}
-              >
-                Powerful Features for Easy, Custom Music Experiences
-              </Typography>
+              <Stack spacing={7}>
+                <Typography
+                  level="h6"
+                  sx={{
+                    fontSize: { xs: "1.5rem", sm: "3rem", md: "3rem" },
+                    fontWeight: "bold",
+                    mt: 4,
+                    mb: 4,
+                    textAlign: "left",
+                  }}
+                >
+                  Powerful Features for Easy, Custom Music Experiences
+                </Typography>
+                <Box
+                  component="section"
+                  sx={{
+                    height: { xs: "auto", md: "550px" },
 
-              <Grid container spacing={2}>
-                {features.map((feature, index) => (
-                  <Grid item xs={12} sm={6} key={index}>
+                    display: "flex",
+                    alignItems: "top",
+                    justifyContent: "center",
+                    textAlign: "center",
+                    gap: "200px",
+                  }}
+                >
+                  <Grid size={6}>
                     <Alert
                       icon={<CheckIcon fontSize="inherit" />}
-                      severity="success"
-                      sx={{ fontSize: 16, alignItems: "center" }}
+                      severity="info"
+                      sx={{
+                        fontSize: 16,
+                        alignItems: "center",
+                        mb: 2,
+                        background: "#e7ecf1",
+                      }}
                     >
-                      {feature}
+                      Spotify OAuth Integration
+                    </Alert>
+                    <Alert
+                      icon={<CheckIcon fontSize="inherit" />}
+                      severity="info"
+                      sx={{
+                        fontSize: 16,
+                        alignItems: "center",
+                        mb: 2,
+                        background: "#e7ecf1",
+                      }}
+                    >
+                      Collaborative Song Queue
+                    </Alert>
+                    <Alert
+                      icon={<CheckIcon fontSize="inherit" />}
+                      severity="info"
+                      sx={{
+                        fontSize: 16,
+                        alignItems: "center",
+                        mb: 2,
+                        background: "#e7ecf1",
+                      }}
+                    >
+                      Song Voting System
+                    </Alert>
+
+                    <Alert
+                      icon={<CheckIcon fontSize="inherit" />}
+                      severity="info"
+                      sx={{
+                        fontSize: 16,
+                        alignItems: "center",
+                        mb: 2,
+                        background: "#e7ecf1",
+                      }}
+                    >
+                      Smart Search via YouTube API
                     </Alert>
                   </Grid>
-                ))}
-              </Grid>
-            </Box> */}
+                  <Grid size={6}>
+                    <Alert
+                      icon={<CheckIcon fontSize="inherit" />}
+                      severity="info"
+                      sx={{
+                        fontSize: 16,
+                        alignItems: "center",
+                        mb: 2,
+                        background: "#e7ecf1",
+                      }}
+                    >
+                      Cloud-Ready Architecture
+                    </Alert>
+                    <Alert
+                      icon={<CheckIcon fontSize="inherit" />}
+                      severity="info"
+                      sx={{
+                        fontSize: 16,
+                        alignItems: "center",
+                        mb: 2,
+                        background: "#e7ecf1",
+                      }}
+                    >
+                      Live Queue Updates
+                    </Alert>
+                    <Alert
+                      icon={<CheckIcon fontSize="inherit" />}
+                      severity="info"
+                      sx={{
+                        fontSize: 16,
+                        alignItems: "center",
+                        mb: 2,
+                        background: "#e7ecf1",
+                      }}
+                    >
+                      Admin Playback Control
+                    </Alert>
+                    <Alert
+                      icon={<CheckIcon fontSize="inherit" />}
+                      severity="info"
+                      sx={{
+                        fontSize: 16,
+                        alignItems: "center",
+                        mb: 2,
+                        background: "#e7ecf1",
+                      }}
+                    >
+                      Responsive Web App
+                    </Alert>
+                  </Grid>
+                  {/* <Grid container spacing={2}>
+                    
+                  </Grid> */}
+                </Box>
+              </Stack>
+            </Box>
+
+            <Divider orientation="horizontal" flexItem />
 
             <Box
               component="section"
@@ -326,28 +431,15 @@ const Home = () => {
               <Typography
                 level="h2"
                 sx={{
-                  fontSize: { xs: 30, sm: 40, md: 50 },
-                  "margin-top": 30,
-                  textAlign: "left",
+                  fontSize: { xs: "1.5rem", sm: "3rem", md: "3rem" },
+                  fontWeight: "bold",
                   p: 2,
-                }}
-              >
-                FAQs
-              </Typography>
-              <Typography
-                level="h6"
-                sx={{
-                  fontSize: { xs: 10, sm: 10, md: 20 },
                   textAlign: "left",
-                  width: "100%",
-                  pl: 2,
-                  mt: 2,
-                  mb: 5,
                 }}
               >
-                Revolutionize group music experiences with smart, collaborative
-                playlists!
+                Frequently Asked Questions
               </Typography>
+              
               <Typography
                 level="h6"
                 sx={{
