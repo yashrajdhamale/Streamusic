@@ -30,6 +30,7 @@ const HomeCarousel = () => {
         // zIndex: 0,
         overflow: "hidden",
         borderRadius: "30px",
+        boxShadow: "0 8px 30px rgba(128, 0, 128, 0.5)", 
       }}
     >
       <Carousel
