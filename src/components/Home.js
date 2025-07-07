@@ -19,7 +19,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { styled } from "@mui/material/styles";
 
 // Custom Component
-import HomeCard from "./HomeAccordian";
+import HomeCard from "./HomeCard";
 import HomeCarousel from "./HomeCarousel";
 
 import GIF from "../assets/Moving The Simpsons GIF.gif";
@@ -425,30 +425,51 @@ const Home = () => {
               component="section"
               sx={{
                 p: 2,
-                height: "660px",
+                pb: 10,
+                height: "auto",
+                display: "flex",
+                justifyContent: "center",
+                alignContent: "center",
+                alignItems: "center",
               }}
             >
-              <Typography
-                level="h2"
+              <Stack
+                spacing={7}
                 sx={{
-                  fontSize: { xs: "1.5rem", sm: "3rem", md: "3rem" },
-                  fontWeight: "bold",
                   p: 2,
-                  textAlign: "left",
+                  height: "auto",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignContent: "center",
+                  alignItems: "center",
                 }}
               >
-                Frequently Asked Questions
-              </Typography>
-              
-              <Typography
-                level="h6"
-                sx={{
-                  fontSize: { xs: 16, sm: 20, md: 40 },
-                  textAlign: "left",
-                }}
-              >
-                <HomeCard />
-              </Typography>
+                <Typography
+                  level="h6"
+                  sx={{
+                    fontSize: { xs: "1.5rem", sm: "3rem", md: "3rem" },
+                    fontWeight: "bold",
+                    mt: 4,
+                    mb: 4,
+                    textAlign: "left",
+                  }}
+                >
+                  Frequently Asked Questions
+                </Typography>
+                <Box
+                  component="section"
+                  sx={{
+                    height: { xs: "auto", md: "auto" },
+                    display: "flex",
+                    alignItems: "top",
+                    justifyContent: "center",
+                    textAlign: "center",
+                    gap: "200px",
+                  }}
+                >
+                  <HomeCard />
+                </Box>
+              </Stack>
             </Box>
           </Stack>
         </Box>

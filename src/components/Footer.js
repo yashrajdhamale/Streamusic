@@ -7,7 +7,7 @@ const Footer = () => {
       component="footer"
       sx={{
         bgcolor: "#c7c6f9",
-        color: "black",
+        color: "#3d2e7c",
         py: 4,
         px: { xs: 2, sm: 4, md: 10 },
       }}
@@ -44,7 +44,7 @@ const Footer = () => {
           <Grid>
             <Link
               href="/Streamusic/admin-login"
-              color="black"
+              color="#3d2e7c"
               underline="hover"
               display="block"
             >
