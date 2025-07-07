@@ -66,6 +66,13 @@ export default function OutlinedCard() {
             border: "black",
             p: 2,
             background: "#e8f5e3",
+            transition: "all 0.3s ease-in-out",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+            "&:hover": {
+              transform: "scale(1.03)",
+              boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
+              borderColor: "transparent",
+            },
           }}
         >
           <React.Fragment>
@@ -101,6 +108,13 @@ export default function OutlinedCard() {
             border: "black",
             p: 2,
             background: "#f8edfb",
+            transition: "all 0.3s ease-in-out",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+            "&:hover": {
+              transform: "scale(1.03)",
+              boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
+              borderColor: "transparent",
+            },
           }}
         >
           <React.Fragment>
@@ -136,6 +150,13 @@ export default function OutlinedCard() {
             border: "black",
             p: 2,
             background: "#dbf0ff",
+            transition: "all 0.3s ease-in-out",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+            "&:hover": {
+              transform: "scale(1.03)",
+              boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
+              borderColor: "transparent",
+            },
           }}
         >
           <React.Fragment>
@@ -171,6 +192,13 @@ export default function OutlinedCard() {
             border: "black",
             p: 2,
             background: "#f0f1ff",
+            transition: "all 0.3s ease-in-out",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+            "&:hover": {
+              transform: "scale(1.03)",
+              boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
+              borderColor: "transparent",
+            },
           }}
         >
           <React.Fragment>
