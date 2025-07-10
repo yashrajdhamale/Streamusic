@@ -22,12 +22,10 @@ const HomeCarousel = () => {
   return (
     <div
       style={{
-        // position: "absolute",
         top: 0,
         left: 0,
         width: "100%",
         height: "100%",
-        // zIndex: 0,
         overflow: "hidden",
         borderRadius: "30px",
         boxShadow: "0 8px 30px rgba(128, 0, 128, 0.5)", 

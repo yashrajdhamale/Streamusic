@@ -21,8 +21,14 @@ import IconButton from "@mui/material/IconButton";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
-import favicon from '../utils/favicon.ico';
+import favicon from "../utils/favicon.ico";
 
+import Avatar from "@mui/material/Avatar";
+import Tooltip from "@mui/material/Tooltip";
+import AdbIcon from "@mui/icons-material/Adb";
+
+import axios from "axios";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -60,132 +66,17 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
   },
 }));
+const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
-function Navbar({ setSearchResults, setShowQueue }) {
+function Navbar({ setSearchResults, setShowQueue, adminLogin }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const searchQuery = useSelector((state) => state.searchQuery.value);
   const { accessToken, expiresAt } = useSelector((state) => state.auth); // using the access token to search the songs
   const { userauth, UaccessToken } = useSelector((state) => state.userauth); // the ans is true or false
   const open = useSelector((state) => state.dialog.open);
-  const [data, setdata] = useState(null);
-  const [session, setSession] = React.useState(null);
 
-  const fetchUserData = async (UaccessToken) => {
-    try {
-      const response = await fetch("https://api.spotify.com/v1/me", {
-        headers: {
-          Authorization: `Bearer ${UaccessToken}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch user data");
-      }
-
-      const userData = await response.json();
-      return {
-        name: userData.display_name,
-        email: userData.email,
-        image: userData.images?.[0]?.url || "",
-      };
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      return null;
-    }
-  };
-
-  const logedIn =
-    document.cookie
-      .split("; ")
-      .find((cookie) => cookie.startsWith("logedIn="))
-      ?.split("=")[1] === "true";
-  const adminLogin =
-    document.cookie
-      .split("; ")
-      .find((cookie) => cookie.startsWith("adminLogin="))
-      ?.split("=")[1] === "true";
-  // const authentication = React.useMemo(() => {
-  //   return {
-  //     signIn: () => {
-  //       dispatch(setOpen(true));
-  //       if (data) {
-  //         setSession({ user: data });
-  //       } else if (adminLogin) {
-  //         setSession({ user: { name: "Admin", email: "thepack@gmail.com" } });
-  //       }
-  //     },
-  //     signOut: () => {
-  //       setSession(null);
-  //       document.cookie = "logedIn=; path=/;  Secure;max-age=0; SameSite=None";
-  //       document.cookie =
-  //         "spotifyAccessToken=; path=/; max-age=0; Secure; SameSite=None";
-  //       document.cookie =
-  //         "spotifyExpiresAt=; path=/; max-age=0;Secure; SameSite=None";
-  //       document.cookie =
-  //         "spotifyRefreshToken=; path=/; max-age=0; Secure; SameSite=None";
-  //       document.cookie =
-  //         "adminLogin=; path=/; Secure;max-age=0; SameSite=None";
-
-  //       dispatch(setAuth({ userauth: false }));
-  //       dispatch(setOpen(true));
-  //     },
-  //   };
-  // }, []);
-
-  const showQueue = () => {
-    setShowQueue((prevState) => !prevState);
-  };
-
-  useEffect(() => {
-    if (UaccessToken) {
-      fetchUserData(UaccessToken).then((userData) => {
-        if (userData) {
-          setdata(userData);
-          setSession({ user: userData }); // Ensure session format
-          dispatch(setOpen(false));
-        }
-      });
-    } else if (adminLogin) {
-      setSession({ user: { name: "Admin", email: "thepack@gmail.com" } });
-      dispatch(setOpen(false));
-    } else {
-      dispatch(setOpen(true));
-    }
-  }, [UaccessToken, adminLogin]); // Added adminLogin dependency
-
-  // Debounced search function
-  useEffect(() => {
-    if (!accessToken || !searchQuery) {
-      return;
-    }
-
-    const timer = setTimeout(async () => {
-      try {
-        dispatch(setLoading(true));
-        const response = await fetch(
-          `https://api.spotify.com/v1/search?q=${encodeURIComponent(searchQuery)}&type=track&limit=10`,
-          { headers: { Authorization: `Bearer ${accessToken}` } }
-        );
-        const data = await response.json();
-        if (data.tracks) {
-          const searchData = data.tracks.items.map((item) => ({
-            id: item.id,
-            title: item.name,
-            thumbnail: item.album.images[0].url,
-            duration: item.duration_ms,
-            artists: item.artists,
-          }));
-          setSearchResults(searchData);
-          dispatch(setLoading(false));
-        }
-      } catch (error) {
-        console.error("Error searching songs:", error);
-      }
-    }, 500); // ⏳ Waits 500ms before making API request
-
-    return () => clearTimeout(timer); // Cleanup function
-  }, [searchQuery, accessToken, setSearchResults]);
   const theme = createTheme({
     palette: {
       secondary: {
@@ -199,10 +90,6 @@ function Navbar({ setSearchResults, setShowQueue }) {
   const [auth, setAuth] = React.useState(true);
   const [anchorEl, setAnchorEl] = React.useState(null);
 
-  const handleChange = (event) => {
-    setAuth(event.target.checked);
-  };
-
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -210,18 +97,55 @@ function Navbar({ setSearchResults, setShowQueue }) {
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const logout = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_BackEnd}/admin/logout`,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+      console.log(response); // ✅ This will now log the response
+
+      if (response.data.success) {
+        console.log("Logout successful");
+
+        queryClient.removeQueries(["adminAuth"]);
+        window.location.href = "/Streamusic";
+        setAnchorEl(null);
+      }
+    } catch (error) {
+      console.error("Error logging out:", error);
+      alert("Failed to log out. Please try again.");
+    }
+  };
+  const gohome = () => {
+    navigate("/Streamusic");
+  };
   return (
     <ThemeProvider theme={theme}>
-      <AppBar position="fixed" color="secondary" padding="20px" width="auto" elevation={0}  >
+      <AppBar
+        position="fixed"
+        color="secondary"
+        padding="20px"
+        width="auto"
+        elevation={0}
+      >
         <Toolbar sx={{ justifyContent: "space-between" }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <IconButton edge="start" color="inherit" aria-label="logo">
-          <img 
-            src={favicon} // replace with your image path
-            alt="Logo"
-            style={{ width: 40, height: 40, borderRadius: '50%' }} // customize as needed
-          />
-        </IconButton>
+            <IconButton edge="start" color="inherit" aria-label="logo">
+              <img
+                src={favicon} // replace with your image path
+                alt="Logo"
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                }} // customize as neededonClick={gohome}
+              />
+            </IconButton>
             <Typography
               variant="h5"
               sx={{
@@ -231,42 +155,47 @@ function Navbar({ setSearchResults, setShowQueue }) {
                 overflow: "visible",
                 textOverflow: "clip",
                 minWidth: "100px",
+                cursor: "pointer",
               }}
+              onClick={gohome}
             >
               Streamusic
             </Typography>{" "}
           </Box>
 
-          {/* <Search >
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              onChange={(e) => dispatch(setQuery(e.target.value))}
-              placeholder="Search…"
-              inputProps={{ "aria-label": "search" }}
-              sx={{border: 1}}
-            />
-          </Search> */}
-          {/* {auth && (
+          {adminLogin && (
+            <Search>
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                onChange={(e) => dispatch(setQuery(e.target.value))}
+                placeholder="Search…"
+                inputProps={{ "aria-label": "search" }}
+                sx={{ border: 1 }}
+              />
+            </Search>
+          )}
+          {adminLogin && (
             <Box sx={{ display: "flex", alignItems: "center", gap: 0 }}>
               <Button
                 variant="text"
                 color="white"
-                onClick={showQueue}
                 sx={{ padding: 1, minWidth: "auto" }}
               >
                 <QueueMusicIcon sx={{ margin: "auto" }} />
               </Button>
               <IconButton
-                size="large"
+                size="small"
                 aria-label="account of current user"
                 aria-controls="menu-appbar"
                 aria-haspopup="true"
                 onClick={handleMenu}
                 color="inherit"
               >
-                <AccountCircle />
+                <IconButton>
+                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                </IconButton>
               </IconButton>
               <Menu
                 id="menu-appbar"
@@ -285,9 +214,10 @@ function Navbar({ setSearchResults, setShowQueue }) {
               >
                 <MenuItem onClick={handleClose}>Profile</MenuItem>
                 <MenuItem onClick={handleClose}>My account</MenuItem>
+                <MenuItem onClick={logout}>Log out</MenuItem>
               </Menu>
             </Box>
-          )} */}
+          )}
         </Toolbar>
       </AppBar>
     </ThemeProvider>
