@@ -10,6 +10,7 @@ import {
   InputAdornment,
   Link,
   IconButton,
+  Alert,
 } from "@mui/material";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import Visibility from "@mui/icons-material/Visibility";
@@ -18,7 +19,7 @@ import { AppProvider } from "@toolpad/core/AppProvider";
 import { SignInPage } from "@toolpad/core/SignInPage";
 import { useTheme } from "@mui/material/styles";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const providers = [{ id: "credentials", name: "Email and Password" }];
@@ -91,7 +92,7 @@ function CustomPasswordField({ PasswordRef }) {
   );
 }
 
-function CustomButton({ EmailRef, PasswordRef }) {
+function CustomButton({ EmailRef, PasswordRef, setLoginStatus }) {
   const AdminLogin = async () => {
     const email = EmailRef.current.value;
     const password = PasswordRef.current.value;
@@ -103,26 +104,25 @@ function CustomButton({ EmailRef, PasswordRef }) {
           headers: {
             "Content-Type": "application/json",
           },
-          credentials: "include", // VERY IMPORTANT if using cookies
-          body: JSON.stringify({
-            mail: email, // You will probably take these from input fields
-            password: password,
-          }),
+          credentials: "include",
+          body: JSON.stringify({ mail: email, password }),
         }
       );
       const data = await response.json();
 
       if (response.status === 400) {
-        alert("User does not exist!");
+        setLoginStatus("notfound");
       } else if (response.ok) {
-        alert("Login successful!");
-        window.location.href = "/Streamusic";
+        setLoginStatus("success");
+        setTimeout(() => {
+          window.location.href = "/Streamusic"; // redirect after short delay
+        }, 1000);
       } else {
-        alert(data.Error);
+        setLoginStatus("error");
       }
     } catch (error) {
       console.error("Error during login:", error);
-      alert("An error occurred during login");
+      setLoginStatus("exception");
     }
   };
 
@@ -166,13 +166,35 @@ function Title() {
   return <h2 style={{ marginBottom: 8 }}>Login</h2>;
 }
 
-// function Subtitle() {
-//   return (
-//     <Alert sx={{ mb: 2, px: 1, py: 0.25, width: '100%' }} severity="warning">
-//       We are investigating an ongoing outage.
-//     </Alert>
-//   );
-// }
+function Subtitle({ loginStatus }) {
+  if (loginStatus === "success") {
+    return (
+      <Alert severity="success" sx={{ mb: 2, px: 1, py: 0.25 }}>
+        Login successful!
+      </Alert>
+    );
+  } else if (loginStatus === "notfound") {
+    return (
+      <Alert severity="error" sx={{ mb: 2, px: 1, py: 0.25 }}>
+        User not found.
+      </Alert>
+    );
+  } else if (loginStatus === "error") {
+    return (
+      <Alert severity="error" sx={{ mb: 2, px: 1, py: 0.25 }}>
+        Invalid credentials.
+      </Alert>
+    );
+  } else if (loginStatus === "exception") {
+    return (
+      <Alert severity="warning" sx={{ mb: 2, px: 1, py: 0.25 }}>
+        An error occurred. Please try again.
+      </Alert>
+    );
+  } else {
+    return null; // nothing shown initially
+  }
+}
 
 function RememberMeCheckbox() {
   const theme = useTheme();
@@ -201,6 +223,8 @@ export default function SlotsSignIn() {
   const theme = useTheme();
   const EmailRef = useRef(null);
   const PasswordRef = useRef(null);
+  const [loginStatus, setLoginStatus] = useState(null); // can be: "success", "error", "notfound", etc.
+
   return (
     <AppProvider theme={theme}>
       <SignInPage
@@ -212,7 +236,7 @@ export default function SlotsSignIn() {
         slots={{
           // expects a fuction/react componet to be passed
           title: Title,
-          // subtitle: Subtitle,
+          subtitle: () => <Subtitle loginStatus={loginStatus} />,
           emailField: (props) => (
             <CustomEmailField EmailRef={EmailRef} {...props} /> //{...props} sends all the old and new props
           ),
@@ -223,6 +247,7 @@ export default function SlotsSignIn() {
             <CustomButton
               EmailRef={EmailRef}
               PasswordRef={PasswordRef}
+              setLoginStatus={setLoginStatus}
               {...props}
             />
           ),
