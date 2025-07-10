@@ -1,7 +1,24 @@
 import { Box, Typography, Divider, Link } from "@mui/material";
-// import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Grid2";
+
 const Footer = () => {
+  const navigate = useNavigate();
+  const gohome = () => {
+  navigate("/Streamusic");
+  window.scrollTo(0, 0); // ✅ Scroll to top
+};
+
+const login = () => {
+  navigate("/Streamusic/admin-login");
+  window.scrollTo(0, 0);
+};
+
+const register = () => {
+  navigate("/Streamusic/admin-registration");
+  window.scrollTo(0, 0);
+};
+
   return (
     <Box
       component="footer"
@@ -33,30 +50,33 @@ const Footer = () => {
           </Grid>
           <Grid>
             <Link
-              href="/Streamusic"
+              onClick={gohome}
               color="inherit"
               underline="hover"
               display="block"
+              style={{ cursor: "pointer" }}
             >
               Home
             </Link>
           </Grid>
           <Grid>
             <Link
-              href="/Streamusic/admin-login"
+              onClick={login}
               color="#3d2e7c"
               underline="hover"
               display="block"
+              style={{ cursor: "pointer" }}
             >
               Admin Login
             </Link>
           </Grid>
           <Grid>
             <Link
-              href="/Streamusic/admin-registration"
+               onClick={register}
               color="inherit"
               underline="hover"
               display="block"
+              style={{ cursor: "pointer" }}
             >
               Register Admin
             </Link>
@@ -73,16 +93,11 @@ const Footer = () => {
           </Typography>
           <Typography variant="body2">Phone: +91 7262924896</Typography>
         </Grid>
-
       </Grid>
 
       <Divider sx={{ bgcolor: "#444", my: 8 }} />
 
-      <Typography
-        variant="body2"
-        align="center"
-        color="gray"
-      >
+      <Typography variant="body2" align="center" color="gray">
         © {new Date().getFullYear()} Streamusic. All rights reserved.
       </Typography>
     </Box>

@@ -115,6 +115,7 @@ function CustomButton({ EmailRef, PasswordRef }) {
         alert("User does not exist!");
       } else if (response.ok) {
         alert("Login successful!");
+        window.location.href = "/Streamusic";
       } else {
         alert(data.Error);
       }
