@@ -19,6 +19,7 @@ import { SignInPage } from "@toolpad/core/SignInPage";
 import { useTheme } from "@mui/material/styles";
 
 import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 const providers = [{ id: "credentials", name: "Email and Password" }];
 
@@ -96,7 +97,7 @@ function CustomButton({ EmailRef, PasswordRef }) {
     const password = PasswordRef.current.value;
     try {
       const response = await fetch(
-        "https://streamusic-backend.onrender.com/admin/login",
+        `${process.env.REACT_APP_BackEnd}/admin/login`,
         {
           method: "POST",
           headers: {
@@ -115,7 +116,7 @@ function CustomButton({ EmailRef, PasswordRef }) {
         alert("User does not exist!");
       } else if (response.ok) {
         alert("Login successful!");
-         window.location.href = "/Streamusic";
+        window.location.href = "/Streamusic";
       } else {
         alert(data.Error);
       }
@@ -142,8 +143,12 @@ function CustomButton({ EmailRef, PasswordRef }) {
 }
 
 function SignUpLink() {
+  const navigate = useNavigate();
+  const signup = () => {
+    navigate("/Streamusic/admin-registration");
+  };
   return (
-    <Link href="/Streamusic/admin-registration" variant="body2">
+    <Link onClick={signup} variant="body2">
       Sign up
     </Link>
   );

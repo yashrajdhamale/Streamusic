@@ -33,7 +33,7 @@ const AdminRegisterWithOtp = () => {
     try {
       setError("");
       const response = await axios.post(
-        "https://streamusic-backend.onrender.com/admin/registration",
+        `${process.env.REACT_APP_BackEnd}/admin/registration`,
         {
           name: form.fullName,
           mail: form.email,
@@ -74,7 +74,7 @@ const AdminRegisterWithOtp = () => {
     setOpen(true);
     try {
       const response = await axios.post(
-        "https://streamusic-backend.onrender.com/admin/registration/send-otp",
+        `${process.env.REACT_APP_BackEnd}/admin/registration/send-otp`,
         { mail: form.email }
       );
       if (response.status === 200) {
@@ -90,7 +90,7 @@ const AdminRegisterWithOtp = () => {
     setSnackbarKey((prev) => prev + 1); // change key to force reopen
     try {
       const response = await axios.post(
-        "https://streamusic-backend.onrender.com/admin/registration/verify-otp",
+        `${process.env.REACT_APP_BackEnd}/admin/registration/verify-otp`,
         { otp: otp, email: form.email } // include email if backend uses it
       );
 

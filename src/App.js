@@ -27,12 +27,13 @@ function App() {
   // Fetching the loging cookies
   const fetchAdminCookies = async () => {
     const res = await axios.get(
-      "https://streamusic-backend.onrender.com/admin/cookies",
+      `${process.env.REACT_APP_BackEnd}/admin/cookies`,
       {
         withCredentials: true, // important to send httpOnly cookies
       }
     );
     return res.data; // { loggedIn: true, adminLogin: true }
+    
   };
   const useAdminAuth = () => {
     return useQuery({
@@ -44,6 +45,7 @@ function App() {
   };
   const { data, isLoading, isError } = useAdminAuth();
   const adminLogin = data?.adminLogin ?? false;
+  console.log(data);
   // -------------------------------------------------------------
 
   const dispatch = useDispatch();

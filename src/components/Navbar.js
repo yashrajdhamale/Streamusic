@@ -106,11 +106,9 @@ function Navbar({ setSearchResults, setShowQueue, adminLogin }) {
           withCredentials: true,
         }
       );
-      console.log(response); // ✅ This will now log the response
 
       if (response.data.success) {
         console.log("Logout successful");
-
         queryClient.removeQueries(["adminAuth"]);
         window.location.href = "/Streamusic";
         setAnchorEl(null);
