@@ -27,7 +27,7 @@ function App() {
   // Fetching the loging cookies
   const fetchAdminCookies = async () => {
     const res = await axios.get(
-      `${process.env.REACT_APP_BackEnd}/admin/cookies`,
+      "https://streamusic-backend.onrender.com/admin/cookies",
       {
         withCredentials: true, // important to send httpOnly cookies
       }

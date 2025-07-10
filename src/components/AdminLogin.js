@@ -96,7 +96,7 @@ function CustomButton({ EmailRef, PasswordRef }) {
     const password = PasswordRef.current.value;
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_BackEnd}/admin/login`,
+        "https://streamusic-backend.onrender.com/admin/login",
         {
           method: "POST",
           headers: {
@@ -115,7 +115,7 @@ function CustomButton({ EmailRef, PasswordRef }) {
         alert("User does not exist!");
       } else if (response.ok) {
         alert("Login successful!");
-        window.location.href = "/Streamusic";
+         window.location.href = "/Streamusic";
       } else {
         alert(data.Error);
       }
