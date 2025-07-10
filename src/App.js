@@ -45,7 +45,6 @@ function App() {
   };
   const { data, isLoading, isError } = useAdminAuth();
   const adminLogin = data?.adminLogin ?? false;
-  console.log(data);
   // -------------------------------------------------------------
 
   const dispatch = useDispatch();
