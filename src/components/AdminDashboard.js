@@ -8,13 +8,15 @@ import { setWindow } from "../store/changewindowSlice.js";
 
 import Grid from "@mui/material/Grid2";
 import { styled, alpha } from "@mui/material/styles";
-import { Box, InputBase, Stack } from "@mui/material";
+import { Box, InputBase, Stack, Button } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import Typography from "@mui/material/Typography";
 
 import AdminQueue from "./AdminQueue.js";
 import QueuedSongs from "./QueuedSongs";
-import ListOFSearchedSong from "./SearchedSong";
+import TrendingSongs from "./TrendingSongs.js";
 import MemberQueue from "./MemberQueue";
+import axios from "axios";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -55,7 +57,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 function AdminDashboard({ adminLogin }) {
   const dispatch = useDispatch();
-  const [showqueue, setShowQueue] = useState(false);
+  const [roomCode, setRoomCode] = useState(null);
+  const [showqueue, setShowQueue] = useState(true);
   const [currentSong, setCurrentSong] = useState(null);
   const [queuedSong, setQueue] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
@@ -81,20 +84,121 @@ function AdminDashboard({ adminLogin }) {
     };
   }, [handleResize, queuedSong]);
 
+  const createRoom = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_BackEnd}/admin/createRoom`,
+        {}, // no body needed
+        {
+          withCredentials: true, // 🔒 Ensures cookies like adminID are sent
+        }
+      );
+
+      if (response.data.success) {
+        const { roomCode, roomId } = response.data;
+        // console.log("Room created or found:", roomCode);
+        fetchRoomCode();
+        // Example: You might want to display the roomCode to the admin
+        // alert(`Room code: ${roomCode}`);
+        return { roomCode, roomId };
+      } else {
+        console.warn("Room creation failed:", response.data.message);
+        return null;
+      }
+    } catch (error) {
+      console.error("Error creating room:", error);
+      alert("Failed to create or fetch the room.");
+      return null;
+    }
+  };
+  const fetchRoomCode = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.REACT_APP_BackEnd}/admin/getRoomCode`,
+        {
+          withCredentials: true, // Include cookies
+        }
+      );
+
+      if (res.data.success) {
+        // console.log("Room Code:", res.data.roomCode);
+        setRoomCode(res.data.roomCode);
+      }
+    } catch (error) {
+      console.error("Failed to fetch room code:", error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    fetchRoomCode();
+  }, []);
   return (
     <Box
       component="main"
       sx={{
         width: "100%",
         minHeight: "100vh",
-        px: { xs: 2, sm: 4 },
-        py: { xs: 4, sm: 6 },
         boxSizing: "border-box",
         bgcolor: "background.default",
-        mt: "30px",
+        pt: "100px",
       }}
     >
-      <Search>
+      <Box
+        component="main"
+        sx={{
+          width: "100%",
+          boxSizing: "border-box",
+          bgcolor: "background.default",
+          mb: "30px",
+          display: "flex",
+          alignContent: "center",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Grid container spacing={2}>
+          <Grid size={6}>
+            <Typography
+              variant="h6"
+              sx={{
+                color: "#1565c0", // darker blue for text
+                fontWeight: "bold",
+                width: "fit-content",
+              }}
+            >
+              {roomCode ? `Room Code: ${roomCode}` : "Create Room --->"}
+            </Typography>
+          </Grid>
+          <Grid size={6}>
+            <Button
+              variant="solid"
+              color="primary"
+              size="small"
+              sx={{
+                borderRadius: "30px",
+                px: 4,
+                fontWeight: "bold",
+                backgroundColor: "#565add",
+                color: "#fff",
+                "&:hover": {
+                  transform: "scale(1.05)",
+                },
+                transition: "all 0.3s ease",
+                boxShadow: "lg",
+                maxWidth: "200px",
+                width: "200px",
+                height: "35px",
+              }}
+              onClick={createRoom}
+            >
+              Create new room
+            </Button>
+          </Grid>
+        </Grid>
+      </Box>
+
+      {/* <Search sx={{ mb: 3 , maxWidth:"80%"}}>
         <SearchIconWrapper>
           <SearchIcon />
         </SearchIconWrapper>
@@ -104,56 +208,13 @@ function AdminDashboard({ adminLogin }) {
           inputProps={{ "aria-label": "search" }}
           sx={{ border: 1 }}
         />
-      </Search>
-      {windowSize.width < 650 ? (
-        <Stack spacing={2}>
-          {showqueue && (
-            <Box>{adminLogin ? <AdminQueue /> : <MemberQueue />}</Box>
-          )}
-          <Box>
-            <ListOFSearchedSong
-              searchResults={searchResults}
-              setQueue={setQueue}
-              adminLogin={adminLogin}
-            />
-          </Box>
-          <Box>
-            <QueuedSongs
-              onSongSelect={setCurrentSong}
-              queuedSong={queuedSong}
-              setQueue={setQueue}
-              adminLogin={adminLogin}
-            />
-          </Box>
-        </Stack>
-      ) : (
-        <Grid container spacing={2}>
-          {showqueue && (
-            <Grid item xs={12}>
-              {adminLogin ? <AdminQueue /> : <MemberQueue />}
-            </Grid>
-          )}
+      </Search> */}
 
-          <Grid item xs={queuedSong.length === 0 ? 12 : 6}>
-            <ListOFSearchedSong
-              searchResults={searchResults}
-              setQueue={setQueue}
-              adminLogin={adminLogin}
-            />
-          </Grid>
-
-          {queuedSong.length > 0 && (
-            <Grid item xs={6}>
-              <QueuedSongs
-                onSongSelect={setCurrentSong}
-                queuedSong={queuedSong}
-                setQueue={setQueue}
-                adminLogin={adminLogin}
-              />
-            </Grid>
-          )}
-        </Grid>
-      )}
+      <TrendingSongs
+        searchResults={searchResults}
+        setQueue={setQueue}
+        adminLogin={adminLogin}
+      />
     </Box>
   );
 }

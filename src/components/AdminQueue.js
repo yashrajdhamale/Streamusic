@@ -20,16 +20,12 @@ import MusicPlayer from "./MusicPlayer"; // Import MusicPlayer
 
 const socket = io(process.env.REACT_APP_BackEnd); // initiates a connection from the client to your backend server using the URL provided and triggers the io.connection function
 
-export default function AdminQueue() {
+export default function AdminQueue({adminLogin}) {
   const [queue, setQueue] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentSong, setCurrentSong] = useState(null); // Store selected song
 
-  const adminLogin =
-    document.cookie
-      .split("; ")
-      .find((cookie) => cookie.startsWith("adminLogin="))
-      ?.split("=")[1] === "true";
+  
 
   // const fetchQueue = async () => {
   //   try {
