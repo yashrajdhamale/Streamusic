@@ -22,7 +22,7 @@ jobs:
 
       - name: Build
         run: |
-           run: CI='' npm run build
+          CI='' npm run build
 
       - name: Deploy
         run: |
