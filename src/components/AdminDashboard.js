@@ -3,7 +3,6 @@ import { debounce } from "lodash";
 
 import { useDispatch, useSelector } from "react-redux";
 
-import { setQuery } from "../store/searchQuerySlice.js";
 import { setWindow } from "../store/changewindowSlice.js";
 
 import Grid from "@mui/material/Grid2";
@@ -13,8 +12,10 @@ import SearchIcon from "@mui/icons-material/Search";
 import Typography from "@mui/material/Typography";
 
 import AdminQueue from "./AdminQueue.js";
+import SelectedSongs from "./SelectedSongs.js";
 import QueuedSongs from "./QueuedSongs";
 import TrendingSongs from "./TrendingSongs.js";
+import SearchedSongs from "./SearchedSongs.js";
 import MemberQueue from "./MemberQueue";
 import axios from "axios";
 
@@ -58,10 +59,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 function AdminDashboard({ adminLogin }) {
   const dispatch = useDispatch();
   const [roomCode, setRoomCode] = useState(null);
-  const [showqueue, setShowQueue] = useState(true);
-  const [currentSong, setCurrentSong] = useState(null);
-  const [queuedSong, setQueue] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
+  const [query, setQuery] = useState(null);
 
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
@@ -82,7 +80,7 @@ function AdminDashboard({ adminLogin }) {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [handleResize, queuedSong]);
+  }, [handleResize]);
 
   const createRoom = async () => {
     try {
@@ -142,79 +140,94 @@ function AdminDashboard({ adminLogin }) {
         boxSizing: "border-box",
         bgcolor: "background.default",
         pt: "100px",
+        display: "flex",
+        justifyContent: "center",
+        alignContent: "center",
+        alignItems: "center",
       }}
     >
       <Box
         component="main"
         sx={{
           width: "100%",
+          minHeight: "100vh",
           boxSizing: "border-box",
           bgcolor: "background.default",
-          mb: "30px",
-          display: "flex",
-          alignContent: "center",
-          justifyContent: "center",
-          alignItems: "center",
         }}
       >
-        <Grid container spacing={2}>
-          <Grid size={6}>
-            <Typography
-              variant="h6"
-              sx={{
-                color: "#1565c0", // darker blue for text
-                fontWeight: "bold",
-                width: "fit-content",
-              }}
-            >
-              {roomCode ? `Room Code: ${roomCode}` : "Create Room --->"}
-            </Typography>
+        <Box
+          component="main"
+          sx={{
+            width: "100%",
+            boxSizing: "border-box",
+            bgcolor: "background.default",
+            mb: "30px",
+            display: "flex",
+            alignContent: "center",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Grid container spacing={2}>
+            <Grid size={6}>
+              <Typography
+                variant="h6"
+                sx={{
+                  color: "#1565c0", // darker blue for text
+                  fontWeight: "bold",
+                  width: "fit-content",
+                }}
+              >
+                {roomCode ? `Room Code: ${roomCode}` : "Create Room --->"}
+              </Typography>
+            </Grid>
+            <Grid size={6}>
+              <Button
+                variant="solid"
+                color="primary"
+                size="small"
+                sx={{
+                  borderRadius: "30px",
+                  px: 4,
+                  fontWeight: "bold",
+                  backgroundColor: "#565add",
+                  color: "#fff",
+                  "&:hover": {
+                    transform: "scale(1.05)",
+                  },
+                  transition: "all 0.3s ease",
+                  boxShadow: "lg",
+                  maxWidth: "200px",
+                  width: "200px",
+                  height: "35px",
+                }}
+                onClick={createRoom}
+              >
+                Create new room
+              </Button>
+            </Grid>
           </Grid>
-          <Grid size={6}>
-            <Button
-              variant="solid"
-              color="primary"
-              size="small"
-              sx={{
-                borderRadius: "30px",
-                px: 4,
-                fontWeight: "bold",
-                backgroundColor: "#565add",
-                color: "#fff",
-                "&:hover": {
-                  transform: "scale(1.05)",
-                },
-                transition: "all 0.3s ease",
-                boxShadow: "lg",
-                maxWidth: "200px",
-                width: "200px",
-                height: "35px",
-              }}
-              onClick={createRoom}
-            >
-              Create new room
-            </Button>
-          </Grid>
-        </Grid>
+        </Box>
+
+        <Search sx={{ mb: 3, ml: 3, mr: 3, width: "100%" }}>
+          <SearchIconWrapper>
+            <SearchIcon />
+          </SearchIconWrapper>
+          <StyledInputBase
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search…"
+            inputProps={{ "aria-label": "search" }}
+            sx={{ border: 1 }}
+          />
+        </Search>
+        <AdminQueue />
+        <SelectedSongs />
+        {query ? (
+          <SearchedSongs query={query} />
+        ) : (
+          <TrendingSongs adminLogin={adminLogin} />
+        )}
       </Box>
-
-      {/* <Search sx={{ mb: 3 , maxWidth:"80%"}}>
-        <SearchIconWrapper>
-          <SearchIcon />
-        </SearchIconWrapper>
-        <StyledInputBase
-          onChange={(e) => dispatch(setQuery(e.target.value))}
-          placeholder="Search…"
-          inputProps={{ "aria-label": "search" }}
-          sx={{ border: 1 }}
-        />
-      </Search> */}
-
-      <TrendingSongs
-        searchResults={searchResults}
-        setQueue={setQueue}
-        adminLogin={adminLogin}
-      />
     </Box>
   );
 }

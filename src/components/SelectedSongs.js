@@ -11,50 +11,37 @@ import {
   Paper,
   IconButton,
 } from "@mui/material";
+import Button from "@mui/material/Button";
+
+import { useDispatch, useSelector } from "react-redux";
+import { removeSong, clearSelectedSongs } from "../store/selectedsongsSlice.js";
+
+import CancelIcon from "@mui/icons-material/Cancel";
+
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 
-import { useDispatch, useSelector } from "react-redux";
-
-import { setLoading } from "../store/loadingSlice.js";
-import { setSelectedSongs, removeSong } from "../store/selectedsongsSlice.js";
-
 export default function TrendingSongs() {
-  const [trendingSongs, setTrendingSongs] = useState([]);
-
-  const fetchTrendingSongs = async () => {
-    try {
-      dispatch(setLoading(true));
-      const response = await axios.get(
-        `${process.env.REACT_APP_BackEnd}/app/getTrendingSongs`
-      );
-
-      if (response.status === 200) {
-        setTrendingSongs(response.data.trending);
-      } else {
-        console.error("Failed to fetch trending songs.");
-      }
-    } catch (error) {
-      console.error("Error fetching trending songs:", error);
-    } finally {
-      dispatch(setLoading(false));
-    }
-  };
-
-  useEffect(() => {
-    fetchTrendingSongs();
-  }, []);
-
   const dispatch = useDispatch();
   const selectedSongs = useSelector((state) => state.selectedSongs.songs);
 
-  const addToSelectedSong = (e, song) => {
-    if (e.target.checked) {
-      const updated = [...selectedSongs, song];
-      dispatch(setSelectedSongs(updated));
-    } else {
-      dispatch(removeSong(song.id));
+  const addSong = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_BackEnd}/admin/addSong`,
+        { songs: selectedSongs }, // <-- Send as 'songs'
+        { withCredentials: true } // to send cookies
+      );
+
+      if (response.status === 200) {
+        dispatch(clearSelectedSongs());
+        alert("Songs added");
+      } else {
+        console.error("Failed to add songs");
+      }
+    } catch (error) {
+      console.error("Error adding songs:", error);
     }
   };
 
@@ -77,18 +64,17 @@ export default function TrendingSongs() {
       }}
     >
       <Typography variant="h5" fontWeight="bold" mb={2}>
-        🔥 Trending Songs
+        Selected Songs
       </Typography>
 
-      {trendingSongs.length === 0 ? (
+      {selectedSongs.length === 0 ? (
         <Box textAlign="center" mt={4}>
-          <CircularProgress />
           <Typography variant="body2" mt={2}>
-            Loading trending songs...
+            Add Songs
           </Typography>
         </Box>
       ) : (
-        trendingSongs.map((song) => (
+        selectedSongs.map((song) => (
           <Paper
             key={song.id}
             elevation={3}
@@ -131,13 +117,41 @@ export default function TrendingSongs() {
               {/* <IconButton color="secondary">
                 <PlayArrowIcon />
               </IconButton> */}
-              <Checkbox
-                color="primary"
-                onChange={(e) => addToSelectedSong(e, song)}
+              <CancelIcon
+                sx={{ cursor: "pointer" }}
+                onClick={(e) => {
+                  dispatch(removeSong(song.id));
+                }}
               />
             </Stack>
           </Paper>
         ))
+      )}
+      {selectedSongs.length !== 0 && (
+        <Button
+          variant="solid"
+          color="primary"
+          size="small"
+          sx={{
+            borderRadius: "30px",
+            px: 4,
+            fontWeight: "bold",
+            backgroundColor: "#565add",
+            color: "#fff",
+            "&:hover": {
+              transform: "scale(1.05)",
+            },
+            transition: "all 0.3s ease",
+            boxShadow: "lg",
+            maxWidth: "200px",
+            width: "200px",
+            height: "60px",
+            border: "5px solid #4B42AD",
+          }}
+          onClick={addSong}
+        >
+          Add to playlist
+        </Button>
       )}
     </Box>
   );

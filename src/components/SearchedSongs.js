@@ -16,35 +16,44 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 
 import { useDispatch, useSelector } from "react-redux";
-
 import { setLoading } from "../store/loadingSlice.js";
 import { setSelectedSongs, removeSong } from "../store/selectedsongsSlice.js";
+export default function SearchedSongs({ query, setadminQueueData }) {
+  const [searchResult, setSearchResult] = useState([]);
+  const [liked, setLiked] = useState({});
 
-export default function TrendingSongs() {
-  const [trendingSongs, setTrendingSongs] = useState([]);
+  const fetchSearchResult = async ({ query }) => {
+    if (!query || query.trim() === "") return; // prevent empty queries
 
-  const fetchTrendingSongs = async () => {
     try {
       dispatch(setLoading(true));
+
       const response = await axios.get(
-        `${process.env.REACT_APP_BackEnd}/app/getTrendingSongs`
+        `${process.env.REACT_APP_BackEnd}/app/getsearchResult`,
+        { params: { query } }
       );
 
       if (response.status === 200) {
-        setTrendingSongs(response.data.trending);
+        setSearchResult(response.data.searchResults);
       } else {
-        console.error("Failed to fetch trending songs.");
+        console.error("Failed to fetch search results.");
       }
     } catch (error) {
-      console.error("Error fetching trending songs:", error);
+      console.error("Error fetching search results:", error);
     } finally {
       dispatch(setLoading(false));
     }
   };
 
   useEffect(() => {
-    fetchTrendingSongs();
-  }, []);
+    if (query && query.trim() !== "") {
+      fetchSearchResult({ query });
+    }
+  }, [query]);
+
+  const toggleLike = (id) => {
+    setLiked((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
 
   const dispatch = useDispatch();
   const selectedSongs = useSelector((state) => state.selectedSongs.songs);
@@ -57,7 +66,6 @@ export default function TrendingSongs() {
       dispatch(removeSong(song.id));
     }
   };
-
   return (
     <Box
       sx={{
@@ -77,18 +85,18 @@ export default function TrendingSongs() {
       }}
     >
       <Typography variant="h5" fontWeight="bold" mb={2}>
-        🔥 Trending Songs
+        🔥 Search Results
       </Typography>
 
-      {trendingSongs.length === 0 ? (
+      {searchResult.length === 0 ? (
         <Box textAlign="center" mt={4}>
           <CircularProgress />
           <Typography variant="body2" mt={2}>
-            Loading trending songs...
+            Loading search result...
           </Typography>
         </Box>
       ) : (
-        trendingSongs.map((song) => (
+        searchResult.map((song) => (
           <Paper
             key={song.id}
             elevation={3}
@@ -132,8 +140,9 @@ export default function TrendingSongs() {
                 <PlayArrowIcon />
               </IconButton> */}
               <Checkbox
-                color="primary"
-                onChange={(e) => addToSelectedSong(e, song)}
+                onChange={(e) => {
+                  addToSelectedSong(e, song);
+                }}
               />
             </Stack>
           </Paper>
