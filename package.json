@@ -36,7 +36,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
+    "deploy": "gh-pages -d build -u \"github-actions[bot] <github-actions[bot]@users.noreply.github.com>\"",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
