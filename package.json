@@ -36,7 +36,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build -u 'GitHub Actions <action@github.com>'",
+    "deploy": "gh-pages -d build -u 'GitHub Actions <action@github.com>' --repo=https://x-access-token:${GITHUB_TOKEN}@github.com/Sarathi062/Streamusic.git",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
