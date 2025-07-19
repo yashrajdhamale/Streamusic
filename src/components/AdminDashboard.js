@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { debounce } from "lodash";
 
 import { useDispatch, useSelector } from "react-redux";
-
 import { setWindow } from "../store/changewindowSlice.js";
 
 import Grid from "@mui/material/Grid2";
