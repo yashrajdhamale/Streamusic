@@ -37,6 +37,7 @@ export default function TrendingSongs() {
       if (response.status === 200) {
         dispatch(clearSelectedSongs());
         alert("Songs added");
+        
       } else {
         console.error("Failed to add songs");
       }

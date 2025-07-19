@@ -17,40 +17,44 @@ import {
 import Alert from "@mui/material/Alert";
 import ClearIcon from "@mui/icons-material/Clear";
 import MusicPlayer from "./MusicPlayer"; // Import MusicPlayer
+import axios from "axios";
 
-const socket = io(process.env.REACT_APP_BackEnd); // initiates a connection from the client to your backend server using the URL provided and triggers the io.connection function
+const socket = io(process.env.REACT_APP_BackEnd, { withCredentials: true }); // initiates a connection from the client to your backend server using the URL provided and triggers the io.connection function
 
-export default function AdminQueue({
-  adminLogin,
-  
-}) {
-  const queue = [];
-  // const [queue, setQueue] = useState([]);
+export default function AdminQueue({ adminLogin }) {
+  const [queue, setQueue] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentSong, setCurrentSong] = useState(null); // Store selected song
 
-  // const fetchQueue = async () => {
-  //   try {
-  //     const response = await fetch(`${process.env.REACT_APP_BackEnd}/queue`);
-  //     const data = await response.json();
-  //     setQueue(data.queue);
-  //   } catch (error) {
-  //     console.error("Error fetching queue:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  const fetchQueue = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.REACT_APP_BackEnd}/admin/getsongs`,
+        {
+          withCredentials: true, // Include cookies
+        }
+      );
 
-  // useEffect(() => {
-  //   // fetchQueue();
-  //   socket.on("queueUpdated", (updatedQueue) => {
-  //     setQueue(updatedQueue);
-  //   });
-
-  //   return () => {
-  //     socket.off("queueUpdated");
-  //   };
-  // }, []);
+      if (res.data.success) {
+        setQueue(res.data.songs);
+      }
+    } catch (error) {
+      console.error("Error fetching queue:", error);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchQueue();
+    socket.emit("join-room");
+    socket.on("update-queue", (songs) => {
+      setQueue(songs);
+    });
+    return () => {
+      socket.off("update-queue");
+    };
+  }, []);
 
   const handleSongSelect = (song) => {
     setCurrentSong(song); // Set the selected song
@@ -69,35 +73,35 @@ export default function AdminQueue({
       setCurrentSong(queue[currentIndex - 1]);
     }
   };
-  // const removeFromQueue = async (song) => {
-  //   const updatedQueue = queue.filter((s) => s.id !== song.id);
-  //   setQueue(updatedQueue); // Update the local queue state
+  const removeFromQueue = async (song) => {
+    const updatedQueue = queue.filter((s) => s.id !== song.id);
+    setQueue(updatedQueue); // Update the local queue state
 
-  //   if (currentSong?.id === song.id) {
-  //     setCurrentSong(null); // Clear the player if the removed song was playing
-  //   }
+    if (currentSong?.id === song.id) {
+      setCurrentSong(null); // Clear the player if the removed song was playing
+    }
 
-  //   // Call the backend to remove the song from the server-side queue
-  //   try {
-  //     const response = await fetch(
-  //       `${process.env.REACT_APP_BackEnd}/queue/remove`,
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({ songId: song.id }), // Send the song ID
-  //       }
-  //     );
+    // Call the backend to remove the song from the server-side queue
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BackEnd}/queue/remove`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ songId: song.id }), // Send the song ID
+        }
+      );
 
-  //     const data = await response.json();
-  //     if (data.message !== "Song removed from queue") {
-  //       console.error("Failed to remove song from backend.");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error removing song from backend:", error);
-  //   }
-  // };
+      const data = await response.json();
+      if (data.message !== "Song removed from queue") {
+        console.error("Failed to remove song from backend.");
+      }
+    } catch (error) {
+      console.error("Error removing song from backend:", error);
+    }
+  };
 
   return (
     <Stack
