@@ -211,7 +211,6 @@ const Home = () => {
                     />
                   </Grid>
                   <Grid size={8}>
-                    {" "}
                     <Typography
                       level="h2"
                       sx={{

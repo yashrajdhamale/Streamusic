@@ -17,40 +17,42 @@ import {
 import Alert from "@mui/material/Alert";
 import ClearIcon from "@mui/icons-material/Clear";
 import MusicPlayer from "./MusicPlayer"; // Import MusicPlayer
+import axios from "axios";
 
-const socket = io(process.env.REACT_APP_BackEnd); // initiates a connection from the client to your backend server using the URL provided and triggers the io.connection function
+const socket = io(process.env.REACT_APP_BackEnd, { withCredentials: true }); // initiates a connection from the client to your backend server using the URL provided and triggers the io.connection function
 
-export default function AdminQueue() {
+export default function AdminQueue({ adminLogin }) {
   const [queue, setQueue] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [currentSong, setCurrentSong] = useState(null); // Store selected song
 
-  const adminLogin =
-    document.cookie
-      .split("; ")
-      .find((cookie) => cookie.startsWith("adminLogin="))
-      ?.split("=")[1] === "true";
+  const fetchQueue = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.REACT_APP_BackEnd}/admin/getsongs`,
+        {
+          withCredentials: true, // Include cookies
+        }
+      );
 
-  // const fetchQueue = async () => {
-  //   try {
-  //     const response = await fetch(`${process.env.REACT_APP_BackEnd}/queue`);
-  //     const data = await response.json();
-  //     setQueue(data.queue);
-  //   } catch (error) {
-  //     console.error("Error fetching queue:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
+      if (res.data.success) {
+        setQueue(res.data.songs);
+      }
+    } catch (error) {
+      console.error("Error fetching queue:", error);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    // fetchQueue();
-    socket.on("queueUpdated", (updatedQueue) => {
-      setQueue(updatedQueue);
+    fetchQueue();
+    socket.emit("join-room");
+    socket.on("update-queue", (songs) => {
+      setQueue(songs);
     });
-
     return () => {
-      socket.off("queueUpdated");
+      socket.off("update-queue");
     };
   }, []);
 
@@ -100,8 +102,6 @@ export default function AdminQueue() {
       console.error("Error removing song from backend:", error);
     }
   };
-
-
 
   return (
     <Stack
@@ -168,9 +168,9 @@ export default function AdminQueue() {
                             </Typography>
                           }
                         />
-                        <Button onClick={() => removeFromQueue(song)}>
+                        {/* <Button onClick={() => removeFromQueue(song)}>
                           <ClearIcon sx={{ width: "40px", height: "40px" }} />
-                        </Button>
+                        </Button> */}
                       </ListItem>
                       <Divider variant="inset" component="li" />
                     </React.Fragment>
